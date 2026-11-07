@@ -34,9 +34,14 @@ bool UTurnoStorySubsystem::HasStoryFlag(FName FlagId) const
 
 bool UTurnoStorySubsystem::SaveGame(AActor* Player, FName SlotName)
 {
-    if (!IsValid(Player) || SlotName.IsNone())
+    if (!IsValid(Player))
     {
         return false;
+    }
+
+    if (SlotName.IsNone())
+    {
+        SlotName = FName(TEXT("TurnoAutoSave"));
     }
 
     UTurnoSaveGame* SaveObject = Cast<UTurnoSaveGame>(
@@ -66,8 +71,17 @@ bool UTurnoStorySubsystem::SaveGame(AActor* Player, FName SlotName)
 
 bool UTurnoStorySubsystem::LoadGame(AActor* Player, FName SlotName)
 {
-    if (!IsValid(Player) || SlotName.IsNone() ||
-        !UGameplayStatics::DoesSaveGameExist(SlotName.ToString(), 0))
+    if (!IsValid(Player))
+    {
+        return false;
+    }
+
+    if (SlotName.IsNone())
+    {
+        SlotName = FName(TEXT("TurnoAutoSave"));
+    }
+
+    if (!UGameplayStatics::DoesSaveGameExist(SlotName.ToString(), 0))
     {
         return false;
     }
