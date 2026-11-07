@@ -188,8 +188,8 @@ function buildRoomProps(){
  generator(-11,-30);addBox('breaker cabinet',[-15,1.25,-33],[.8,2.5,.5],M.steel,true);for(let i=0;i<4;i++)addCylinder('cable conduit',[-15+i*.12,2.6,-31],.035,.035,4.3,M.yellow,[Math.PI/2,0,0]);
  trolley(-9.2,-34);makePaper([-11,1.85,-30],'GENERADOR DE EMERGENCIA|RESTABLECER SISTEMA',0);makeInteractable('generator','Poner en marcha el generador',[-11,1.82,-30]);
  // Director's office.
- desk(-11,-44);addBox('director filing cabinet',[-15,1.15,-46],[.9,2.3,.55],M.steel,true);makePaper([-11,1.02,-44],'DANIEL SALVATIERRA|EXPEDIENTE ORIGINAL · 2006',0);makeInteractable('directorFile','Examinar expediente original',[-11,1.05,-44]);
- makeInteractable('hideSpot','Esconderse en armario',[-15,1.1,11.7]);
+ desk(-11,-44);addBox('director filing cabinet',[-15,1.15,-46],[.9,2.3,.55],M.steel,true);addBox('corridor locker',[-4.7,1.1,0],[.75,2.2,.7],M.blue,true);makePaper([-11,1.02,-44],'DANIEL SALVATIERRA|EXPEDIENTE ORIGINAL · 2006',0);makeInteractable('directorFile','Examinar expediente original',[-11,1.05,-44]);
+ makeInteractable('hideSpot','Esconderse en armario',[-4.7,1.1,0]);
 }
 function createAlma(){
  const g=new THREE.Group();g.name='ALMA_GHOST';
