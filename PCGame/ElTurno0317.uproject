@@ -11,7 +11,9 @@
     }
   ],
   "Plugins": [
-    { "Name": "EnhancedInput", "Enabled": true },
-    { "Name": "GameplayCameras", "Enabled": true }
+    {
+      "Name": "EnhancedInput",
+      "Enabled": true
+    }
   ]
 }
