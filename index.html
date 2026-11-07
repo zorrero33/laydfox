@@ -1,102 +1,90 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#070b0e"><title>EL TURNO DE LAS 03:17</title><style>
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#070b0e;color:#e8e9e4;font-family:Arial,sans-serif}canvas{position:fixed;inset:0;width:100%;height:100%}#fx{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse,transparent 30%,#020507c9 100%)}.screen,.overlay{position:fixed;inset:0;display:grid;place-items:center;background:linear-gradient(90deg,#04080bf0,#050a0dbb),radial-gradient(ellipse at 75% 45%,#34474a,#080d10 70%);z-index:10}.panel{width:min(720px,92vw);max-height:92vh;overflow:auto;padding:clamp(24px,5vw,52px);background:#080e13ed;border:1px solid #81918c55;box-shadow:0 25px 100px #000c}.eyebrow{font-size:10px;letter-spacing:.3em;color:#a8b3ad;text-transform:uppercase}h1,h2{font-family:Impact,Arial Narrow,sans-serif;text-transform:uppercase;line-height:.9;margin:20px 0}h1{font-size:clamp(56px,10vw,100px)}h1 span{color:#9caeaa}h2{font-size:48px}p{color:#bdc6c1;line-height:1.65}.rule{width:85px;height:2px;background:#9b5650;margin:25px 0}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:25px}button{font:600 11px Arial;letter-spacing:.12em;padding:14px 18px;background:#874944;color:#fff;border:1px solid #b16b64;cursor:pointer}button.secondary{background:transparent;border-color:#667670;color:#d9dfda}button:disabled{opacity:.3}.hidden{display:none!important}#hud{position:fixed;inset:0;z-index:4;pointer-events:none;padding:24px;display:flex;justify-content:space-between;text-shadow:0 2px 10px #000}#brand{font-size:10px;letter-spacing:.23em;color:#b1bbb6}#objective{margin-top:8px;font-size:13px;max-width:380px}#right{text-align:right;font-size:11px;letter-spacing:.12em}#clock{font-size:18px;margin-bottom:6px}#battery{width:125px;height:4px;background:#46504d;margin:7px 0 0 auto}#battery i{display:block;height:100%;width:100%;background:#c1c8bb}#cross{position:fixed;z-index:5;left:50%;top:50%;width:5px;height:5px;border-radius:50%;background:#e9eee7;box-shadow:0 0 8px white;transform:translate(-50%,-50%)}#hint,#toast,#subtitle{position:fixed;z-index:6;left:50%;transform:translateX(-50%);background:#071015df;border:1px solid #78867d66;padding:12px 18px;font-size:12px;text-align:center;max-width:min(90vw,650px);pointer-events:none}#hint{bottom:12%}#toast{top:18%}#subtitle{bottom:4%;font-style:italic;color:#e5dfd0}.overlay{background:#020608df}.card{width:min(620px,92vw);padding:28px;background:#0b1218;border:1px solid #65707788;max-height:88vh;overflow:auto}.entry{padding:12px;border-left:2px solid #8d5551;background:#ffffff08;margin:8px 0;font-size:13px}.entry small{display:block;color:#9eaaa4;margin-top:5px}.keys{display:flex;gap:10px;margin:18px 0}.keys button{flex:1}.small{font-size:11px;color:#8e9a95}#chapter{position:fixed;z-index:8;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;text-shadow:0 3px 18px #000}#chapter strong{font:800 clamp(32px,6vw,60px) Impact;display:block;letter-spacing:.08em}#chapter span{font-size:10px;letter-spacing:.35em;color:#c2c8c1}@media(max-width:600px){#hud{padding:13px}#objective{max-width:210px;font-size:11px}h1{font-size:56px}}
-</style></head><body><canvas id="g"></canvas><div id="fx"></div>
-<section id="start" class="screen"><div class="panel"><div class="eyebrow">Terror psicológico · Supervivencia · 2026</div><h1>EL TURNO<br><span>DE LAS 03:17</span></h1><div class="rule"></div><p>HOSPITAL SANTA AURELIA · TURNO NOCTURNO</p><p>23:00. Cincuenta euros por hora. Un edificio casi vacío. Un contrato que no deberías haber firmado.</p><div class="actions"><button id="new">COMENZAR NUEVA PARTIDA</button><button class="secondary" id="cont">CONTINUAR</button></div><p class="small">WASD moverse · Ratón mirar · MAYÚS correr · E interactuar · F linterna · TAB inventario · ESC pausa</p><div class="eyebrow">SEIS CAPÍTULOS · FINALES MÚLTIPLES</div></div></section>
-<div id="hud" class="hidden"><div><div id="brand">HOSPITAL SANTA AURELIA · ALA NORTE</div><div id="objective"></div></div><div id="right"><div id="clock">23:00</div><div>LINTERNA · <span id="pct">100%</span></div><div id="battery"><i id="bar"></i></div></div></div><div id="cross" class="hidden"></div><div id="hint" class="hidden"></div><div id="toast" class="hidden"></div><div id="subtitle" class="hidden"></div><div id="chapter" class="hidden"><strong></strong><span></span></div>
-<section id="inventory" class="overlay hidden"><div class="card"><div class="eyebrow">ÁLEX RIVAS · ARCHIVO PERSONAL</div><h2>INVENTARIO</h2><div id="items"></div><button id="iclose">CERRAR · TAB</button></div></section>
-<section id="document" class="overlay hidden"><div class="card"><div class="eyebrow">SANTA AURELIA · DOCUMENTO</div><h2 id="dt"></h2><p id="db" style="white-space:pre-line"></p><button id="dclose">CERRAR · E</button></div></section>
-<section id="puzzle" class="overlay hidden"><div class="card"><div class="eyebrow">CUARTO ELÉCTRICO · CUADRO B</div><h2>REARME DE EMERGENCIA</h2><p>El protocolo indica la secuencia <b>1 → 3 → 2</b>.</p><div class="keys"><button data-p="1">FASE 1</button><button data-p="2">FASE 2</button><button data-p="3">FASE 3</button></div><p id="feedback" class="small">Introduce la secuencia.</p><button class="secondary" id="pcancel">CANCELAR</button></div></section>
-<section id="pause" class="overlay hidden"><div class="card"><div class="eyebrow">SANTA AURELIA · 03:17</div><h2>PAUSA</h2><p>El edificio sigue respirando.</p><button id="resume">VOLVER AL TURNO</button> <button class="secondary" id="save">GUARDAR PARTIDA</button><p class="small">WASD · Ratón · Mayús · E · F · Tab · Esc</p></div></section>
-<section id="death" class="overlay hidden"><div class="card"><div class="eyebrow">HOSPITAL SANTA AURELIA</div><h2>NO DEBISTE MIRAR</h2><p>El turno no ha terminado. Pero tú sí.</p><button id="retry">REINTENTAR</button> <button class="secondary" id="dmenu">MENÚ</button></div></section>
-<section id="ending" class="overlay hidden"><div class="card"><div class="eyebrow">03:17 · ÚLTIMA NOCHE</div><h2>EL EXPEDIENTE FINAL</h2><p>Has reunido las pruebas. Decide qué hacer con la verdad.</p><div class="actions"><button data-end="truth">PUBLICAR LA VERDAD</button><button class="secondary" data-end="silence">GUARDAR SILENCIO</button><button class="secondary" data-end="stay">ACEPTAR OTRO TURNO</button></div></div></section>
-<script>
-(()=>{'use strict';
-const $=id=>document.getElementById(id),canvas=$('g'),gl=canvas.getContext('webgl',{antialias:true,alpha:false});if(!gl){alert('Activa WebGL o la aceleración gráfica del navegador.');return}
-const V='attribute vec3 p;attribute vec3 n;attribute vec3 c;uniform mat4 vp;varying vec3 N;varying vec3 C;varying vec3 P;void main(){gl_Position=vp*vec4(p,1.);N=n;C=c;P=p;}';
-const F='precision mediump float;varying vec3 N;varying vec3 C;varying vec3 P;uniform vec3 eye;uniform vec3 fwd;uniform float lamp;void main(){float d=max(dot(normalize(N),normalize(vec3(-.3,.85,.25))),0.);float dist=length(eye-P);float cone=max(dot(normalize(P-eye),normalize(fwd)),0.);float spot=lamp*pow(cone,14.)*max(0.,1.-dist/18.);float l=.15+d*.15+spot*.9;float fog=clamp((dist-10.)/23.,0.,.78);vec3 col=C*l;col=mix(col,vec3(.025,.038,.043),fog);gl_FragColor=vec4(col,1.);}';
-function sh(t,s){let a=gl.createShader(t);gl.shaderSource(a,s);gl.compileShader(a);if(!gl.getShaderParameter(a,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(a));return a}
-let pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,V));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,F));gl.linkProgram(pr);gl.useProgram(pr);
-let L={p:gl.getAttribLocation(pr,'p'),n:gl.getAttribLocation(pr,'n'),c:gl.getAttribLocation(pr,'c'),vp:gl.getUniformLocation(pr,'vp'),eye:gl.getUniformLocation(pr,'eye'),fwd:gl.getUniformLocation(pr,'fwd'),lamp:gl.getUniformLocation(pr,'lamp')},buf=gl.createBuffer();gl.enable(gl.DEPTH_TEST);gl.enable(gl.CULL_FACE);
-const C={floor:[.17,.21,.20],wall:[.45,.51,.46],low:[.06,.14,.14],ceil:[.42,.46,.43],steel:[.30,.37,.38],white:[.68,.69,.62],wood:[.23,.15,.09],linen:[.65,.66,.59],dark:[.018,.023,.025],blue:[.045,.11,.14],skin:[.38,.25,.20],hair:[.018,.015,.014],ghost:[.72,.77,.72],red:[.42,.035,.025],green:[.08,.33,.16],screen:[.10,.30,.26],paper:[.67,.62,.48]};
-let boxes=[],solids=[],doors={};function box(n,x,y,z,sx,sy,sz,col,solid=false){let o={n,x,y,z,sx,sy,sz,col};boxes.push(o);if(solid)solids.push(o);return o}
-function wall(x,z,sx,sz){box('wall',x,1.55,z,sx,3.1,sz,C.wall,true)}
-function bed(x,z){box('frame',x,.42,z,2,.14,.86,C.steel);box('mattress',x,.58,z,1.92,.20,.80,C.linen);box('pillow',x-.68,.72,z,.38,.12,.64,C.white);box('headboard',x-1.02,.94,z,.10,.90,.90,C.wood);for(let dx of [-.75,.75])for(let dz of [-.3,.3])box('caster',x+dx,.2,z+dz,.13,.13,.13,C.dark)}
-function cart(x,z){box('trolley',x,.72,z,1,1.05,.52,C.steel);box('top',x,1.29,z,1.12,.08,.62,C.white);for(let i=0;i<3;i++)box('drawer',x,.48+i*.22,z-.27,.76,.12,.025,C.white)}
-function human(x,z,scale,col){box('torso',x,1*scale,z,.48*scale,.66*scale,.28*scale,col);box('head',x,1.52*scale,z,.32*scale,.38*scale,.31*scale,C.skin);box('hair',x,1.72*scale,z+.02,.34*scale,.14*scale,.33*scale,C.hair);for(let dx of [-.31,.31]){box('arm',x+dx*scale,1.02*scale,z,.14*scale,.57*scale,.16*scale,col);box('leg',x+dx*.45*scale,.36*scale,z,.17*scale,.56*scale,.2,C.dark)}}
-function desk(x,z){box('desk',x,.82,z,2.7,.18,1.05,C.wood);box('leg',x-1.1,.4,z,.12,.8,.9,C.wood);box('leg',x+1.1,.4,z,.12,.8,.9,C.wood);box('monitor',x,1.4,z-.35,.7,.6,.12,C.dark);box('screen',x,1.4,z-.425,.58,.45,.02,C.screen)}
-// Hospital footprint, wards, reception, archive, room 317 and basement.
-box('floor',0,-.18,0,42,.36,50,C.floor);box('ceiling',0,3.45,0,42,.18,50,C.ceil);
-wall(0,-25,42,.22);wall(0,25,42,.22);wall(-21,0,.22,50);wall(21,0,.22,50);
-for(let z of [-18,-10,-2,6,14,22])for(let x of [-5.2,5.2]){wall(x,z,.20,5.4);box('guard',x,.58,z,.08,.22,5.2,C.low)}
-for(let x of [-10,0,10]){wall(x,-14,.18,7);wall(x,14,.18,7)}
-for(let z=-22;z<24;z+=4){box('lamp',0,3.28,z,1.5,.06,.42,C.white);box('ceiling tile',0,3.37,z+1.5,3.7,.02,2.5,C.ceil)}
-bed(-14,-17);bed(14,-17);bed(-14,17);bed(14,17);bed(-14,7);bed(14,7);cart(-9,7);cart(9,-7);desk(-13,-3);
-box('chair',-13,.52,-1.7,.62,1,.62,C.blue);
-for(let z of [-19,-14,-9]){box('archive shelf',13,1.25,z,4,.12,.42,C.steel);for(let r=0;r<4;r++)for(let c=0;c<4;c++)box('archive box',11.5+c*.9,.42+r*.5,z-.25,.65,.35,.24,(r+c)%3?C.wood:C.white)}
-box('wardrobe',18,1.25,-18,1.2,2.5,.8,C.white);box('clock',18,2.4,-14,.55,.55,.1,C.dark);box('surgery table',14,.8,17,2,.18,.85,C.steel);box('crash cart',8,.75,17,1.1,1.2,.62,C.red);
-box('generator',0,1,-22,2.3,1.8,1.6,C.steel);box('generator screen',0,1.5,-21.15,1.2,.7,.08,C.screen);
-doors.ward=box('door',0,1.3,10,3.6,2.6,.16,C.wood,true);doors.archive=box('door',10,1.3,-7,2.2,2.6,.16,C.wood,true);doors.room=box('door',10,1.3,-17,2.2,2.6,.16,C.wood,true);doors.basement=box('door',0,1.3,-19,2.4,2.6,.16,C.red,true);
-for(let z=-20;z<23;z+=6){box('handrail',-5.05,1,z,.07,.08,5.4,C.steel);box('handrail',5.05,1,z,.07,.08,5.4,C.steel);box('exit',-5,2.8,z,.1,.26,.8,C.green)}
-box('locker',-18,1.1,2,1.2,2.2,.9,C.blue,true);box('locker',18,1.1,2,1.2,2.2,.9,C.blue,true);
-let player={x:-13,z:5,yaw:0,pitch:0},enemy={x:0,z:-10,active:false,phase:0},state={key:false,fuse:false,protocol:false,power:false,ward:false,record:false,room:false,drawing:false,photo:false,archive:false,incident:false,basement:false,generator:false,items:[],chapter:1,checkpoint:{x:-13,z:5}};
-let started=false,paused=false,modal='',hidden=false,flash=true,battery=100,stamina=100,clock=0,last=0,keys=new Set(),toastTime=0,subTime=0,chapterTime=0,dead=false,phaseSeq=[];
-const items=[
-['Contrato',-13,5],['Llavero',-13,-2],['Fusible',-9,7],['Protocolo',-9,9],['Cuadro',0,5],['Ala',0,10],['Registro',14,7],['Puerta317',14,-17],['Dibujo',16,-17],['Foto',17,-14],['Archivo',13,-14],['Expediente',13,-19],['Sotano',0,-19],['Generador',0,-22],['Despacho',-13,-3],['TaquillaA',-18,2],['TaquillaB',18,2]];
-function dist(x,z){return Math.hypot(x-player.x,z-player.z)}
-function blocked(x,z){for(let b of solids){if((b===doors.ward&&state.ward)||(b===doors.archive&&state.archive)||(b===doors.room&&state.room)||(b===doors.basement&&state.basement))continue;if(x>b.x-b.sx/2-.16&&x<b.x+b.sx/2+.16&&z>b.z-b.sz/2-.16&&z<b.z+b.sz/2+.16&&b.y+b.sy/2>.35)return true}return false}
-function nearest(){let best=2.5,out=null;for(let [id,x,z] of items){let d=dist(x,z),a=Math.atan2(x-player.x,-(z-player.z))-player.yaw;a=Math.atan2(Math.sin(a),Math.cos(a));if(d<best&&Math.abs(a)<.7){best=d;out={id,x,z}}}return out}
-function toast(t){$('toast').textContent=t;$('toast').classList.remove('hidden');toastTime=3}
-function say(t){$('subtitle').textContent=t;$('subtitle').classList.remove('hidden');subTime=5}
-function chapter(n,title,desc){state.chapter=n;$('chapter').querySelector('strong').textContent=title;$('chapter').querySelector('span').textContent=desc;$('chapter').classList.remove('hidden');chapterTime=4}
-function objective(){if(state.chapter===1)return state.key?'Busca el fusible y el protocolo de rearme.':'Recoge el llavero de mantenimiento.';if(state.chapter===2)return state.record?'Investiga la habitación 317.':'Abre el ala norte y lee el registro.';if(state.chapter===3)return state.photo?'Accede al archivo histórico.':'Abre la 317 y examina el dibujo y la foto.';if(state.chapter===4)return state.incident?'Baja al sótano.':'Encuentra el expediente de 2006.';if(state.chapter===5)return state.generator?'Vuelve al despacho del director.':'Arranca el generador. El celador te ha visto.';return 'Decide qué hacer con las pruebas.'}
-function hud(){$('objective').textContent='Objetivo: '+objective();$('pct').textContent=Math.round(battery)+'%';$('bar').style.width=battery+'%';$('clock').textContent=String(Math.floor((23*60+clock)/60)%24).padStart(2,'0')+':'+String(Math.floor((23*60+clock)%60)).padStart(2,'0')}
-function documentView(t,b){$('dt').textContent=t;$('db').textContent=b;$('document').classList.remove('hidden');modal='document';document.exitPointerLock?.()}
-function close(id){$(id).classList.add('hidden');modal=''}
-function add(n,d){if(!state.items.some(a=>a[0]===n))state.items.push([n,d])}
-function save(){localStorage.setItem('santa0317save',JSON.stringify({state,player,battery,clock,enemy}));toast('Partida guardada en este navegador.')}
-function syncDoors(){if(state.ward)unlock(doors.ward);if(state.archive)unlock(doors.archive);if(state.room)unlock(doors.room);if(state.basement)unlock(doors.basement)}
-function load(){try{let s=JSON.parse(localStorage.getItem('santa0317save'));if(!s)return false;Object.assign(state,s.state);Object.assign(player,s.player);battery=s.battery;clock=s.clock;Object.assign(enemy,s.enemy);syncDoors();return true}catch{return false}}
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#070c0f">
+<meta name="description" content="EL TURNO DE LAS 03:17 — experiencia de terror psicológico 3D para navegador.">
+<title>EL TURNO DE LAS 03:17 — Hospital Santa Aurelia</title>
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<canvas id="gameCanvas" aria-label="Escenario 3D de Hospital Santa Aurelia"></canvas>
+<div id="vignette"></div>
+<section id="startScreen" class="screen">
+ <div class="panel">
+  <div class="eyebrow">Terror psicológico · Supervivencia · 2026</div>
+  <h1>EL TURNO<br><span>DE LAS 03:17</span></h1>
+  <div class="rule"></div>
+  <p>HOSPITAL SANTA AURELIA · TURNO NOCTURNO</p>
+  <p>23:00. Cincuenta euros por hora. Un edificio casi vacío. Un contrato que nunca debiste firmar.</p>
+  <div class="actions">
+   <button id="newGameButton">Comenzar nueva partida</button>
+   <button id="continueButton" class="secondary" disabled>Continuar</button>
+  </div>
+  <div class="control-line">WASD mover · Ratón mirar · MAYÚS correr · CTRL agacharse · E interactuar · F linterna · TAB inventario · F5 guardar · F9 cargar · ESC pausa</div>
+  <p class="small">Para una experiencia óptima, juega en ordenador con teclado y ratón. El navegador necesita WebGL activado.</p>
+  <div class="eyebrow">SEIS CAPÍTULOS · TRES FINALES · GUARDADO LOCAL</div>
+ </div>
+</section>
+<div id="hud" class="hidden">
+ <div><div id="brand">HOSPITAL SANTA AURELIA · TURNO NOCTURNO</div><div id="objective"></div></div>
+ <div id="hudRight"><div id="clock">23:00</div><div>LINTERNA · <span id="batteryValue">100%</span></div><div id="batteryBar"><i></i></div><div>RESISTENCIA</div><div id="staminaBar"><i></i></div><div id="torchState">ENCENDIDA</div><div id="enemyState">SEÑAL DESCONOCIDA</div></div>
+</div>
+<div id="crosshair" class="hidden"></div>
+<div id="interactionPrompt" class="hidden"></div>
+<div id="toast" class="hidden"></div>
+<div id="subtitle" class="hidden"></div>
+<div id="chapterCard" class="hidden"><strong id="chapterTitle"></strong><span id="chapterSub"></span></div>
+<div id="controlHint" class="hidden">HAZ CLIC PARA RECUPERAR EL CONTROL DEL RATÓN</div>
 
-let AC=null,master=null,stepAt=0,heartbeatAt=0;
-function initAudio(){try{if(AC){AC.resume();return}AC=new(window.AudioContext||window.webkitAudioContext)();master=AC.createGain();master.gain.value=.26;master.connect(AC.destination);let o=AC.createOscillator(),g=AC.createGain(),f=AC.createBiquadFilter();o.type='sawtooth';o.frequency.value=42;f.type='lowpass';f.frequency.value=105;g.gain.value=.032;o.connect(f);f.connect(g);g.connect(master);o.start();let l=AC.createOscillator(),lg=AC.createGain();l.frequency.value=.11;lg.gain.value=12;l.connect(lg);lg.connect(f.frequency);l.start()}catch(e){}}
-function soundStep(){if(!AC||!master)return;let len=Math.floor(AC.sampleRate*.1),b=AC.createBuffer(1,len,AC.sampleRate),d=b.getChannelData(0);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*(1-i/len);let src=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();src.buffer=b;f.type='lowpass';f.frequency.value=160;g.gain.setValueAtTime(.14,AC.currentTime);g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+.1);src.connect(f);f.connect(g);g.connect(master);src.start()}
-function heartbeat(){if(!AC||!master)return;let o=AC.createOscillator(),g=AC.createGain();o.type='sine';o.frequency.value=52;g.gain.setValueAtTime(.0001,AC.currentTime);g.gain.exponentialRampToValueAtTime(.10,AC.currentTime+.04);g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+.19);o.connect(g);g.connect(master);o.start();o.stop(AC.currentTime+.21)}
-
-function start(fresh){initAudio();if(fresh){state={key:false,fuse:false,protocol:false,power:false,ward:false,record:false,room:false,drawing:false,photo:false,archive:false,incident:false,basement:false,generator:false,items:[],chapter:1,checkpoint:{x:-13,z:5}};player.x=-13;player.z=5;player.yaw=0;battery=100;clock=0;enemy.active=false;for(let d of Object.values(doors)){d.col=C.wood;if(!solids.includes(d))solids.push(d)}}started=true;paused=false;$('start').classList.add('hidden');$('hud').classList.remove('hidden');$('cross').classList.remove('hidden');if(fresh)chapter(1,'EL CONTRATO','23:00 · PRIMER TURNO');else chapter(state.chapter,({1:'EL CONTRATO',2:'LA PLANTA CERRADA',3:'HABITACIÓN 317',4:'LOS ARCHIVOS',5:'EL SÓTANO',6:'LA ÚLTIMA NOCHE'})[state.chapter]||'EL TURNO','PARTIDA CONTINUADA');say('ÁLEX: Cincuenta euros la hora. ¿Qué podría salir mal?');hud();canvas.requestPointerLock?.()}
-function unlock(d){solids=solids.filter(x=>x!==d);d.col=C.dark}
-function interact(){let o=nearest();if(!o)return;switch(o.id){
-case'Contrato':documentView('CONTRATO DE SERVICIOS NOCTURNOS','HOSPITAL SANTA AURELIA\\n\\nContratista: Álex Rivas\\nHorario: 23:00–06:00\\nRemuneración: 50 €/hora\\n\\nTareas: revisar incidencias, comprobar puertas, restablecer suministros.\\n\\nNota manuscrita: «Si el reloj se detiene a las 03:17, no contestes al teléfono».');break;
-case'Llavero':state.key=true;add('Llavero de mantenimiento','Llaves de servicio y control eléctrico.');items.splice(items.findIndex(i=>i[0]==='Llavero'),1);toast('Has recogido el llavero.');break;
-case'Fusible':if(!state.key){toast('Primero recoge el llavero.');break}state.fuse=true;add('Fusible cerámico','Repuesto de 16 amperios.');items.splice(items.findIndex(i=>i[0]==='Fusible'),1);toast('Fusible recogido.');break;
-case'Protocolo':state.protocol=true;add('Protocolo de rearme','Secuencia 1 → 3 → 2.');documentView('PROTOCOLO DE REARME','CUADRO B — MANTENIMIENTO\\n\\nSustituir el fusible cerámico. Activar fases en orden: 1 → 3 → 2.\\n\\nFirma: D. Salvatierra · 2006');break;
-case'Cuadro':if(!state.fuse||!state.protocol){toast('Necesitas fusible y protocolo.');break}$('puzzle').classList.remove('hidden');modal='puzzle';phaseSeq=[];document.exitPointerLock?.();break;
-case'Ala':if(!state.power){toast('La puerta magnética no tiene corriente.');break}state.ward=true;unlock(doors.ward);chapter(2,'LA PLANTA CERRADA','EL REGISTRO DE ENFERMERÍA');say('ALTAVOZ: «Personal autorizado, planta norte».');break;
-case'Registro':if(!state.ward){toast('La sala sigue bloqueada.');break}state.record=true;add('Registro de enfermería','Entrada de Alma S. el 14/09/2006.');documentView('REGISTRO DE ENFERMERÍA · 2006','PACIENTE: ALMA S. · 8 AÑOS\\n\\nIngreso: 21:40. Tutor legal: Daniel S.\\n\\nLa menor solicita que no se avise a su padre.\\n\\nNota: «La niña repite que el doctor no es su padre».');chapter(3,'HABITACIÓN 317','LA NIÑA DEL DIBUJO');enemy.active=true;say('Una puerta golpea al fondo del pasillo.');break;
-case'Puerta317':if(!state.key){toast('Necesitas la llave de mantenimiento.');break}state.room=true;unlock(doors.room);toast('La habitación 317 se abre.');break;
-case'Dibujo':if(!state.room){toast('La puerta está cerrada.');break}state.drawing=true;add('Dibujo infantil','Una niña. Tres figuras. 03:17.');documentView('DIBUJO INFANTIL','Una casa. Tres figuras frente a una ventana.\\n\\n«PAPÁ DICE QUE A LAS 03:17 TODO SE ACABA».\\n\\nEn el margen: «Mamá, ven a buscarme».');say('ALMA: «No le digas que estoy aquí…»');break;
-case'Foto':if(!state.drawing){toast('Busca primero el dibujo.');break}state.photo=true;add('Fotografía familiar','Daniel, Lucía y Alma. Fecha: 2006.');documentView('FOTOGRAFÍA FAMILIAR','Daniel y Lucía junto a Alma.\\n\\nEn el reverso: «Prueba de ADN recibida. Daniel aún no lo sabe».');break;
-case'Archivo':if(!state.photo){toast('Necesitas la fotografía como pista.');break}state.archive=true;unlock(doors.archive);toast('El archivo histórico queda abierto.');break;
-case'Expediente':if(!state.archive){toast('El archivo está cerrado.');break}state.incident=true;add('Expediente 14/09/2006','Informe de incidente.');documentView('EXPEDIENTE 14/09/2006','El doctor Daniel S. accedió a la habitación 317 a las 03:12. La paciente falleció a las 03:17.\\n\\nLa investigación interna fue cerrada por orden de dirección.\\n\\nNota: «No registrar la discusión sobre el resultado de ADN».');chapter(5,'EL SÓTANO','EL CELADOR TE HA ENCONTRADO');enemy.active=true;break;
-case'Sotano':if(!state.incident){toast('Aún no tienes el expediente.');break}state.basement=true;unlock(doors.basement);toast('La puerta del sótano se abre.');break;
-case'Generador':if(!state.basement){toast('No puedes acceder al generador.');break}state.generator=true;add('Grabación de seguridad','Cinta recuperada del sistema.');documentView('REGISTRO DE AUDIO · 03:17','DANIEL: «No eres mi hija».\\nALMA: «Papá, tengo miedo».\\nDANIEL: «Nadie tiene que saberlo».\\n\\n[Golpe. Silencio. Tres pitidos.]');chapter(6,'LA ÚLTIMA NOCHE','EL DESPACHO DEL DIRECTOR');say('CELADOR: «Ahora ya sabes lo que pasó».');break;
-case'Despacho':if(!state.generator){toast('Te falta la grabación del sótano.');break}$('ending').classList.remove('hidden');modal='ending';document.exitPointerLock?.();break;
-case'TaquillaA':case'TaquillaB':if(enemy.active&&dist(enemy.x,enemy.z)<7){hidden=!hidden;toast(hidden?'Te escondes en la taquilla.':'Sales del escondite.')}else toast('Una taquilla metálica vacía.');break;
-}}
-function phase(n){phaseSeq.push(n);$('feedback').textContent='FASES: '+phaseSeq.join(' → ');if(phaseSeq.length===3){if(phaseSeq.join('')==='132'){state.power=true;close('puzzle');toast('La corriente vuelve. Algo golpea al fondo.');say('ALTAVOZ: «Álex…»')}else{phaseSeq=[];$('feedback').textContent='Secuencia incorrecta. Vuelve a intentarlo.'}}}
-function end(kind){$('ending').classList.add('hidden');$('start').classList.remove('hidden');$('start').querySelector('.panel').innerHTML='<div class="eyebrow">HOSPITAL SANTA AURELIA · 06:00</div><h1>FINAL: '+(kind==='truth'?'LA VERDAD':kind==='silence'?'EL SILENCIO':'EL NUEVO TURNO')+'</h1><div class="rule"></div><p>'+(kind==='truth'?'Has entregado el expediente. La investigación se reabre. Al amanecer, el hospital queda vacío.':kind==='silence'?'Has guardado silencio. A las 03:17, el teléfono vuelve a sonar.':'Aceptas el siguiente turno. En la hoja de servicios aparece un nombre nuevo: Álex Rivas.')+'</p><button onclick="location.reload()">VOLVER A JUGAR</button>';started=false;modal='';document.exitPointerLock?.()}
-function buildVerts(){let a=[],faces=[[[0,0,1],[[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1]]],[[0,0,-1],[[1,-1,-1],[-1,-1,-1],[-1,1,-1],[1,1,-1]]],[[1,0,0],[[1,-1,1],[1,-1,-1],[1,1,-1],[1,1,1]]],[[-1,0,0],[[-1,-1,-1],[-1,-1,1],[-1,1,1],[-1,1,-1]]],[[0,1,0],[[-1,1,1],[1,1,1],[1,1,-1],[-1,1,-1]]],[[0,-1,0],[[-1,-1,-1],[1,-1,-1],[1,-1,1],[-1,-1,1]]]];for(let o of boxes){for(let [n,v] of faces)for(let i of [0,1,2,0,2,3]){let q=v[i];a.push(o.x+q[0]*o.sx/2,o.y+q[1]*o.sy/2,o.z+q[2]*o.sz/2,n[0],n[1],n[2],...o.col)}}if(enemy.active){let bob=Math.sin(performance.now()*.004)*.04;let parts=[{x:enemy.x,y:1.05+bob,z:enemy.z,sx:.48,sy:.82,sz:.3,col:C.blue},{x:enemy.x,y:1.72+bob,z:enemy.z,sx:.34,sy:.38,sz:.32,col:C.skin},{x:enemy.x,y:1.91+bob,z:enemy.z+.02,sx:.36,sy:.15,sz:.34,col:C.hair}];for(let dx of [-.34,.34])parts.push({x:enemy.x+dx,y:1.04+bob,z:enemy.z,sx:.15,sy:.66,sz:.17,col:C.blue},{x:enemy.x+dx*.45,y:.36,z:enemy.z,sx:.18,sy:.62,sz:.22,col:C.dark});for(let o of parts)for(let [n,v] of faces)for(let i of [0,1,2,0,2,3]){let q=v[i];a.push(o.x+q[0]*o.sx/2,o.y+q[1]*o.sy/2,o.z+q[2]*o.sz/2,n[0],n[1],n[2],...o.col)}}if(state.drawing){let y=1.1+Math.sin(performance.now()*.002)*.06;for(let o of [{x:16,y,z:-16.4,sx:.36,sy:.82,sz:.22,col:C.ghost},{x:16,y:y+.55,z:-16.4,sx:.30,sy:.30,sz:.28,col:C.hair}])for(let [n,v] of faces)for(let i of [0,1,2,0,2,3]){let q=v[i];a.push(o.x+q[0]*o.sx/2,o.y+q[1]*o.sy/2,o.z+q[2]*o.sz/2,n[0],n[1],n[2],...o.col)}}return new Float32Array(a)}
-function norm(a){let l=Math.hypot(...a)||1;return a.map(x=>x/l)}function cross(a,b){return[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]]}function dot(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]}
-function look(eye,center){let z=norm([eye[0]-center[0],eye[1]-center[1],eye[2]-center[2]]),x=norm(cross([0,1,0],z)),y=cross(z,x);return new Float32Array([x[0],y[0],z[0],0,x[1],y[1],z[1],0,x[2],y[2],z[2],0,-dot(x,eye),-dot(y,eye),-dot(z,eye),1])}
-function perspective(f,a,n,f2){let t=1/Math.tan(f/2),nf=1/(n-f2);return new Float32Array([t/a,0,0,0,0,t,0,0,0,0,(f2+n)*nf,-1,0,0,2*f2*n*nf,0])}
-function multiply(a,b){let o=new Float32Array(16);for(let c=0;c<4;c++)for(let r=0;r<4;r++)o[c*4+r]=a[r]*b[c*4]+a[4+r]*b[c*4+1]+a[8+r]*b[c*4+2]+a[12+r]*b[c*4+3];return o}
-function render(){let a=buildVerts();gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.bufferData(gl.ARRAY_BUFFER,a,gl.DYNAMIC_DRAW);let st=36;for(let [k,s,o] of [['p',3,0],['n',3,3],['c',3,6]]){gl.enableVertexAttribArray(L[k]);gl.vertexAttribPointer(L[k],s,gl.FLOAT,false,st,o*4)}let eye=[player.x,1.65,player.z],f=[Math.sin(player.yaw)*Math.cos(player.pitch),Math.sin(player.pitch),-Math.cos(player.yaw)*Math.cos(player.pitch)],center=[eye[0]+f[0],eye[1]+f[1],eye[2]+f[2]],v=look(eye,center),p=perspective(Math.PI/2.35,canvas.width/canvas.height,.05,80);gl.uniformMatrix4fv(L.vp,false,multiply(p,v));gl.uniform3fv(L.eye,eye);gl.uniform3fv(L.fwd,f);gl.uniform1f(L.lamp,flash?1:0);gl.drawArrays(gl.TRIANGLES,0,a.length/9)}
-function ai(dt){if(!enemy.active||hidden)return;let d=dist(enemy.x,enemy.z);if(d<16){let dx=player.x-enemy.x,dz=player.z-enemy.z,l=Math.hypot(dx,dz)||1,s=(flash&&d<7?.8:1.25)*dt,nx=enemy.x+dx/l*s,nz=enemy.z+dz/l*s;if(!blocked(nx,enemy.z))enemy.x=nx;if(!blocked(enemy.x,nz))enemy.z=nz;if(d<1){paused=true;modal='death';$('death').classList.remove('hidden');document.exitPointerLock?.()}}else{enemy.phase+=dt;enemy.x=Math.sin(enemy.phase*.2)*2;enemy.z=-10+Math.sin(enemy.phase*.15)*2}}
-function resize(){canvas.width=innerWidth*Math.min(devicePixelRatio||1,1.5);canvas.height=innerHeight*Math.min(devicePixelRatio||1,1.5);gl.viewport(0,0,canvas.width,canvas.height)}addEventListener('resize',resize);resize();
-function frame(t){let dt=Math.min((t-last)/1000,.05);last=t;if(started&&!paused&&!modal){let fast=keys.has('ShiftLeft')&&stamina>0,s=(fast?4.2:2.5)*dt,dx=0,dz=0;if(keys.has('KeyW')){dx+=Math.sin(player.yaw)*s;dz-=Math.cos(player.yaw)*s}if(keys.has('KeyS')){dx-=Math.sin(player.yaw)*s;dz+=Math.cos(player.yaw)*s}if(keys.has('KeyA')){dx-=Math.cos(player.yaw)*s;dz-=Math.sin(player.yaw)*s}if(keys.has('KeyD')){dx+=Math.cos(player.yaw)*s;dz+=Math.sin(player.yaw)*s}if(!hidden){if(!blocked(player.x+dx,player.z))player.x+=dx;if(!blocked(player.x,player.z+dz))player.z+=dz}stamina=fast?Math.max(0,stamina-dt*24):Math.min(100,stamina+dt*12);if(flash){battery=Math.max(0,battery-dt*.2);if(!battery)flash=false}if((Math.abs(dx)+Math.abs(dz))>.0001&&t-stepAt>480){soundStep();stepAt=t}if(enemy.active&&dist(enemy.x,enemy.z)<7&&t-heartbeatAt>1200){heartbeat();heartbeatAt=t}clock+=dt*.7;ai(dt);hud();if(state.chapter===1&&state.power){state.chapter=2;chapter(2,'LA PLANTA CERRADA','EL REGISTRO DE ENFERMERÍA')}if(state.chapter===2&&state.record){state.chapter=3;chapter(3,'HABITACIÓN 317','LA NIÑA DEL DIBUJO')}if(state.chapter===3&&state.photo&&state.drawing){state.chapter=4;chapter(4,'LOS ARCHIVOS','EXPEDIENTE 2006')}if(state.chapter===4&&state.incident){state.chapter=5;chapter(5,'EL SÓTANO','EL CELADOR TE HA VISTO')}if(state.chapter===5&&state.generator){state.chapter=6;chapter(6,'LA ÚLTIMA NOCHE','EL DESPACHO DEL DIRECTOR')}}
-render();if(toastTime>0&&(toastTime-=dt)<=0)$('toast').classList.add('hidden');if(subTime>0&&(subTime-=dt)<=0)$('subtitle').classList.add('hidden');if(chapterTime>0&&(chapterTime-=dt)<=0)$('chapter').classList.add('hidden');let o=started&&!paused&&!modal?nearest():null;if(o){$('hint').textContent='E · '+({Contrato:'Leer el contrato',Llavero:'Recoger llavero',Fusible:'Recoger fusible',Protocolo:'Leer protocolo',Cuadro:'Examinar cuadro eléctrico',Ala:'Abrir ala norte',Registro:'Leer registro',Puerta317:'Abrir habitación 317',Dibujo:'Examinar dibujo',Foto:'Examinar fotografía',Archivo:'Abrir archivo',Expediente:'Leer expediente',Sotano:'Abrir sótano',Generador:'Examinar generador',Despacho:'Entrar en despacho',TaquillaA:'Esconderse',TaquillaB:'Esconderse'}[o.id]||'Interactuar');$('hint').classList.remove('hidden')}else $('hint').classList.add('hidden');requestAnimationFrame(frame)}
-document.addEventListener('mousemove',e=>{if(document.pointerLockElement===canvas&&started&&!paused&&!modal&&!hidden){player.yaw+=e.movementX*.002;player.pitch=Math.max(-.55,Math.min(.55,player.pitch-e.movementY*.0015))}});
-document.addEventListener('keydown',e=>{keys.add(e.code);if(e.repeat)return;if(e.code==='KeyE'&&started&&!modal)interact();if(e.code==='KeyF'&&started&&!modal){flash=!flash;toast(flash?'Linterna encendida.':'Linterna apagada.')}if(e.code==='Tab'&&started){e.preventDefault();if(modal==='inventory')close('inventory');else{$('items').innerHTML=state.items.map(i=>'<div class="entry">'+i[0]+'<small>'+i[1]+'</small></div>').join('')||'<p class="small">Vacío.</p>';$('inventory').classList.remove('hidden');modal='inventory';document.exitPointerLock?.()}}if(e.code==='Escape'&&started){if(modal)close(modal);else{paused=true;$('pause').classList.remove('hidden');document.exitPointerLock?.()}}});
-document.addEventListener('keyup',e=>keys.delete(e.code));canvas.addEventListener('click',()=>{if(started&&!paused&&!modal)canvas.requestPointerLock?.()});
-$('new').onclick=()=>start(true);$('cont').onclick=()=>{if(load())start(false);else toast('No hay partida guardada.')};$('iclose').onclick=()=>close('inventory');$('dclose').onclick=()=>close('document');$('pcancel').onclick=()=>close('puzzle');document.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>phase(Number(b.dataset.p)));$('resume').onclick=()=>{paused=false;close('pause');canvas.requestPointerLock?.()};$('save').onclick=save;$('retry').onclick=()=>{paused=false;enemy.active=false;player.x=state.checkpoint.x;player.z=state.checkpoint.z;close('death');canvas.requestPointerLock?.()};$('dmenu').onclick=()=>location.reload();document.querySelectorAll('[data-end]').forEach(b=>b.onclick=()=>end(b.dataset.end));$('cont').disabled=!localStorage.getItem('santa0317save');requestAnimationFrame(frame);
-})();
-</script></body></html>
+<section id="inventoryPanel" class="overlay hidden"><div class="card">
+ <div class="eyebrow">ÁLEX RIVAS · ARCHIVO PERSONAL</div><h2>INVENTARIO Y DIARIO</h2>
+ <div id="inventoryList" class="entry-list"></div>
+ <p class="small">Las pruebas recogidas se conservan en el guardado local.</p>
+ <button id="inventoryClose">Cerrar · TAB</button>
+</div></section>
+<section id="documentPanel" class="overlay hidden"><div class="card">
+ <div class="eyebrow">SANTA AURELIA · DOCUMENTO</div><h2 id="docTitle"></h2><p id="docBody" style="white-space:pre-line"></p>
+ <button id="docClose">Cerrar · continuar</button>
+</div></section>
+<section id="puzzlePanel" class="overlay hidden"><div class="card">
+ <div class="eyebrow">CUARTO ELÉCTRICO · CUADRO B</div><h2>REARME DE EMERGENCIA</h2>
+ <p>El protocolo indica la secuencia <b>1 → 3 → 2</b>. Un error reinicia la secuencia.</p>
+ <div class="phase-row"><button data-phase="1">FASE 1</button><button data-phase="2">FASE 2</button><button data-phase="3">FASE 3</button></div>
+ <p id="phaseFeedback" class="small">Introduce la secuencia.</p><button id="puzzleCancel" class="secondary">Cancelar</button>
+</div></section>
+<section id="codePanel" class="overlay hidden"><div class="card">
+ <div class="eyebrow">DESPACHO DEL DIRECTOR · CERRADURA</div><h2>CÓDIGO DE ACCESO</h2><p>La última nota indica que la puerta abre con la hora detenida.</p>
+ <input id="codeInput" class="code-input" inputmode="numeric" maxlength="4" placeholder="••••" aria-label="Código de acceso">
+ <p id="codeFeedback" class="small">Introduce el código de cuatro cifras.</p>
+ <div class="actions"><button id="codeSubmit">Abrir cerradura</button><button id="codeCancel" class="secondary">Cancelar</button></div>
+</div></section>
+<section id="pausePanel" class="overlay hidden"><div class="card">
+ <div class="eyebrow">HOSPITAL SANTA AURELIA · 03:17</div><h2>PAUSA</h2><p>El edificio sigue respirando.</p>
+ <div class="actions"><button id="resumeButton">Volver al turno</button><button id="saveButton" class="secondary">Guardar · F5</button><button id="loadButton" class="secondary">Cargar · F9</button><button id="settingsButton" class="secondary">Ajustes</button><button id="fullscreenButton" class="secondary">Pantalla completa</button><button id="menuButton" class="secondary">Menú principal</button></div>
+ <p class="small">WASD · Ratón · Mayús · Ctrl · E · F · TAB · F5 · F9 · ESC</p>
+</div></section>
+<section id="settingsPanel" class="overlay hidden"><div class="card">
+ <div class="eyebrow">CONFIGURACIÓN</div><h2>AJUSTES</h2>
+ <label class="setting">Volumen <input id="volumeControl" type="range" min="0" max="100" value="45"></label>
+ <label class="setting">Sensibilidad ratón <input id="sensitivityControl" type="range" min="5" max="100" value="40"></label>
+ <button id="settingsClose">Volver</button>
+</div></section>
+<section id="deathPanel" class="overlay hidden"><div class="card">
+ <div class="eyebrow">HOSPITAL SANTA AURELIA</div><h2>NO DEBISTE MIRAR</h2><p>El turno no ha terminado. Pero tú sí.</p>
+ <button id="retryButton">Reintentar desde el último punto</button>
+</div></section>
+<section id="endingPanel" class="overlay hidden"><div class="card">
+ <div class="eyebrow">03:17 · ÚLTIMA NOCHE</div><h2>EL EXPEDIENTE FINAL</h2><p>Has reunido las pruebas. Decide qué hacer con la verdad.</p>
+ <div class="actions"><button data-ending="truth">Publicar la verdad</button><button data-ending="silence" class="secondary">Guardar silencio</button><button data-ending="stay" class="secondary">Aceptar otro turno</button></div>
+</div></section>
+<section id="finalScreen" class="overlay hidden"><div class="card">
+ <div class="eyebrow">HOSPITAL SANTA AURELIA · 06:00</div><h2 id="finalTitle">FINAL</h2><p id="finalText"></p><div id="secretEnding" class="final-note hidden"></div>
+ <div class="actions"><button onclick="location.reload()">Volver a jugar</button></div>
+</div></section>
+<section id="fatal" class="screen fatal hidden"><div class="panel"><h2>No se ha podido iniciar</h2><p id="fatalText"></p></div></section>
+<script src="./vendor/three.min.js"></script>
+<script src="./game.js"></script>
+</body>
+</html>
