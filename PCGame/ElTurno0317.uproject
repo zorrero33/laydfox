@@ -1,0 +1,17 @@
+{
+  "FileVersion": 3,
+  "EngineAssociation": "5.8",
+  "Category": "Horror",
+  "Description": "EL TURNO DE LAS 03:17 - Psychological horror PC game",
+  "Modules": [
+    {
+      "Name": "ElTurno0317",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    }
+  ],
+  "Plugins": [
+    { "Name": "EnhancedInput", "Enabled": true },
+    { "Name": "GameplayCameras", "Enabled": true }
+  ]
+}
