@@ -22,7 +22,7 @@ public:
     void RestoreEvidenceIds(const TArray<FName>& SavedIds);
 
     UFUNCTION(BlueprintPure, Category="Turno|Inventory")
-    const TArray<FName>& GetEvidenceIds() const { return EvidenceIds; }
+    TArray<FName> GetEvidenceIds() const { return EvidenceIds; }
 
 private:
     UPROPERTY(VisibleAnywhere, SaveGame, Category="Turno|Inventory")
