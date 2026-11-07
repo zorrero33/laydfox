@@ -25,7 +25,7 @@ const interactables=[];
 const doors={};
 const flickerLights=[];
 const materials={};
-let player={x:-11,z:27,yaw:0,pitch:0,height:1.68};
+let player={x:-11,z:25.5,yaw:0,pitch:0,height:1.68};
 let state=makeState();
 let enemy=null,alma=null;
 let started=false,paused=false,modal='',hidden=false,flashOn=true,flashBattery=100,stamina=100;
@@ -34,7 +34,7 @@ let keys=new Set(),moving=false,sprinting=false,crouching=false,lastTime=0,phase
 let audioCtx=null,audioMaster=null,droneOsc=null,droneGain=null;
 let volume=.45,sensitivity=.0021;
 const SAVE_KEY='santa0317_web_2026';
-function makeState(){return {chapter:1,key:false,fuse:false,protocol:false,power:false,ward:false,record:false,room317:false,drawing:false,photo:false,almaMet:false,archive:false,incident:false,morgue:false,securityTape:false,clockCode:false,basement:false,generator:false,directorCode:false,directorEvidence:false,paranormal:false,secretClues:0,items:[],flags:[],checkpoint:{x:-11,z:27,yaw:0},ending:null};}
+function makeState(){return {chapter:1,key:false,fuse:false,protocol:false,power:false,ward:false,record:false,room317:false,drawing:false,photo:false,almaMet:false,archive:false,incident:false,morgue:false,securityTape:false,clockCode:false,basement:false,generator:false,directorCode:false,directorEvidence:false,paranormal:false,secretClues:0,items:[],flags:[],checkpoint:{x:-11,z:25.5,yaw:0},ending:null};}
 function mat(name,color,rough=.78,metal=0,emissive=0){
  if(materials[name])return materials[name];
  const m=new THREE.MeshStandardMaterial({color,roughness:rough,metalness:metal,emissive:color,emissiveIntensity:emissive});
@@ -338,6 +338,7 @@ function loadGame(){
  }catch(e){toast('La partida guardada no se puede leer.');return false;}
 }
 function syncWorldState(){
+ openDoorInstant('doorReception');
  if(state.power)openDoorInstant('doorWard');
  if(state.ward)doors.doorWard.opened=true;
  if(state.room317)openDoorInstant('door317');
@@ -358,20 +359,22 @@ function animateDoor(d,open){
 }
 function handleDoor(id){
  const d=doors[id];if(!d)return;
+ if(id==='doorDirector'){
+  if(!state.generator||!state.clockCode){toast('Necesitas activar el generador y descubrir el código 0317.');return;}
+  $('codeInput').value='';$('codeFeedback').textContent='Introduce el código de cuatro cifras.';openPanel('codePanel');return;
+ }
  let ok=false;
  if(id==='doorWard')ok=state.power;
  if(id==='door317')ok=state.key&&state.record;
  if(id==='doorArchive')ok=state.photo&&state.drawing;
  if(id==='doorMorgue'||id==='doorBasement')ok=state.incident;
- if(id==='doorDirector')ok=state.generator&&state.clockCode;
- if(!ok){const msg={doorWard:'La cerradura magnética no tiene corriente.',door317:'Necesitas el llavero y el registro de enfermería.',doorArchive:'La fotografía y el dibujo revelan el acceso al archivo.',doorMorgue:'Primero debes encontrar el expediente de 2006.',doorBasement:'La puerta está sellada hasta encontrar el expediente.',doorDirector:'Necesitas activar el generador y descubrir el código 0317.'};toast(msg[id]||'La puerta está cerrada.');return;}
+ if(!ok){const msg={doorWard:'La cerradura magnética no tiene corriente.',door317:'Necesitas el llavero y el registro de enfermería.',doorArchive:'La fotografía y el dibujo revelan el acceso al archivo.',doorMorgue:'Primero debes encontrar el expediente de 2006.',doorBasement:'La puerta está sellada hasta encontrar el expediente.'};toast(msg[id]||'La puerta está cerrada.');return;}
  animateDoor(d,true);soundDoor();
  if(id==='doorWard'){state.ward=true;chapter(2,'LA PLANTA CERRADA','EL REGISTRO DE ENFERMERÍA');subtitle('ALTAVOZ: Personal autorizado, planta norte.');}
  if(id==='door317'){state.room317=true;toast('La habitación 317 se abre.');}
  if(id==='doorArchive'){state.archive=true;toast('El archivo médico está abierto.');}
  if(id==='doorMorgue'){state.morgue=true;toast('La morgue huele a desinfectante viejo.');}
  if(id==='doorBasement'){state.basement=true;toast('La puerta del sótano se abre con un golpe seco.');}
- if(id==='doorDirector'){state.directorCode=true;toast('La cerradura acepta el código 0317.');}
 }
 function interact(o){
  if(!o)return;
@@ -405,7 +408,7 @@ function interact(o){
  case'generator':
   if(!state.basement){toast('La sala técnica está cerrada.');break;}if(state.generator){toast('El generador ya está funcionando.');break;}state.generator=true;addEvidence('Registro del generador','La energía del ala norte se restauró a las 03:17.');openDocument('GENERADOR DE EMERGENCIA','El interruptor se resiste. Al activarlo, el edificio entero vibra.\\n\\nEn el panel: 03:17.\\n\\nUna grabación automática reproduce una voz infantil: «Papá, tengo miedo».');chapter(6,'LA ÚLTIMA NOCHE','EL DESPACHO DEL DIRECTOR');subtitle('CELADOR: Ahora ya sabes lo que pasó.');enemy.visible=true;break;
  case'directorFile':
-  if(!state.directorCode){toast('La puerta de dirección está cerrada.');break;}state.directorEvidence=true;addEvidence('Expediente original','La dirección ordenó cerrar la investigación y alterar el registro.');openDocument('EXPEDIENTE ORIGINAL · DANIEL SALVATIERRA','La prueba genética fue recibida el 14/09/2006.\\n\\nDaniel descubrió que no era el padre biológico de Alma.\\n\\nLa discusión en la habitación 317 fue ocultada por la dirección. El celador recibió instrucciones para retirar la cinta.\\n\\nA las 03:17, Alma dejó de responder.');openPanel('endingPanel');break;
+  if(!state.directorCode){toast('La puerta de dirección está cerrada.');break;}state.directorEvidence=true;addEvidence('Expediente original','La dirección ordenó cerrar la investigación y alterar el registro.');openDocument('EXPEDIENTE ORIGINAL · DANIEL SALVATIERRA','La prueba genética fue recibida el 14/09/2006.\\n\\nDaniel descubrió que no era el padre biológico de Alma.\\n\\nLa discusión en la habitación 317 fue ocultada por la dirección. El celador recibió instrucciones para retirar la cinta.\\n\\nA las 03:17, Alma dejó de responder.');break;
  case'batteries':
   flashBattery=Math.min(100,flashBattery+45);toast('Pilas recogidas. Linterna al '+Math.round(flashBattery)+'%.');break;
  case'hideSpot':
@@ -457,7 +460,7 @@ function soundWhisper(){soundTone(520,.9,.035,'sine');setTimeout(()=>soundTone(4
 function lockPointer(){if(started&&!paused&&!modal&&canvas.requestPointerLock)canvas.requestPointerLock();}
 function startGame(fresh){
  startAudio();if(fresh){
-  state=makeState();player={x:-11,z:27,yaw:0,pitch:0,height:1.68};flashBattery=100;gameMinutes=0;stamina=100;flashOn=true;hidden=false;clockEvent=false;phaseInput=[];enemy.visible=false;enemy.position.set(0,0,-36);alma.visible=false;
+  state=makeState();player={x:-11,z:25.5,yaw:0,pitch:0,height:1.68};flashBattery=100;gameMinutes=0;stamina=100;flashOn=true;hidden=false;clockEvent=false;phaseInput=[];enemy.visible=false;enemy.position.set(0,0,-36);alma.visible=false;
   for(const d of Object.values(doors)){d.opened=false;d.openTarget=0;d.progress=0;d.group.position.z=d.z;const panel=d.group.children[0];panel.material=d.id==='doorBasement'?M.red:M.wood;if(!colliderList.includes(d.collider))colliderList.push(d.collider);}
   openDoorInstant('doorReception');
  }else{if(!loadGame()){toast('No existe una partida válida.');return;}}
@@ -573,7 +576,7 @@ $('saveButton').onclick=saveGame;
 $('loadButton').onclick=()=>{if(loadGame()){paused=false;closePanel('pausePanel');modal='';toast('Partida cargada.');lockPointer();}else toast('No hay partida guardada.');};
 $('menuButton').onclick=()=>{paused=true;modal='';document.exitPointerLock?.();$('pausePanel').classList.add('hidden');$('hud').classList.add('hidden');$('crosshair').classList.add('hidden');$('startScreen').classList.remove('hidden');started=false;};
 $('retryButton').onclick=retryCheckpoint;
-$('docClose').onclick=()=>{closePanel('documentPanel');lockPointer();};
+$('docClose').onclick=()=>{closePanel('documentPanel');if(state.directorEvidence){openPanel('endingPanel');}else lockPointer();};
 $('inventoryClose').onclick=()=>{closePanel('inventoryPanel');lockPointer();};
 $('puzzleCancel').onclick=()=>{closePanel('puzzlePanel');lockPointer();};
 $('codeSubmit').onclick=()=>{enterDirectorCode();if(!modal)lockPointer();};
