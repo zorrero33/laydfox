@@ -37,6 +37,8 @@ protected:
     void StopCrouch();
     void ToggleFlashlight();
     void Interact();
+    void SaveProgress();
+    void LoadProgress();
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Turno|Player")
     TObjectPtr<UCameraComponent> FirstPersonCamera;
