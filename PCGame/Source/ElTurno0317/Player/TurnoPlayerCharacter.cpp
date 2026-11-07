@@ -7,6 +7,8 @@
 #include "Interaction/TurnoInteractable.h"
 #include "DrawDebugHelpers.h"
 #include "Engine/World.h"
+#include "Engine/Engine.h"
+#include "Systems/TurnoStorySubsystem.h"
 
 ATurnoPlayerCharacter::ATurnoPlayerCharacter()
 {
@@ -65,6 +67,8 @@ void ATurnoPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
     PlayerInputComponent->BindAction(TEXT("Crouch"), IE_Released, this, &ATurnoPlayerCharacter::StopCrouch);
     PlayerInputComponent->BindAction(TEXT("Flashlight"), IE_Pressed, this, &ATurnoPlayerCharacter::ToggleFlashlight);
     PlayerInputComponent->BindAction(TEXT("Interact"), IE_Pressed, this, &ATurnoPlayerCharacter::Interact);
+    PlayerInputComponent->BindAction(TEXT("SaveGame"), IE_Pressed, this, &ATurnoPlayerCharacter::SaveProgress);
+    PlayerInputComponent->BindAction(TEXT("LoadGame"), IE_Pressed, this, &ATurnoPlayerCharacter::LoadProgress);
 }
 
 void ATurnoPlayerCharacter::MoveForward(float Value)
@@ -141,4 +145,29 @@ void ATurnoPlayerCharacter::Interact()
 void ATurnoPlayerCharacter::SetFlashlightBattery(float NewBattery)
 {
     FlashlightBattery = FMath::Clamp(NewBattery, 0.0f, 100.0f);
+}
+void ATurnoPlayerCharacter::SaveProgress()
+{
+    if (UTurnoStorySubsystem* Story = GetWorld()->GetSubsystem<UTurnoStorySubsystem>())
+    {
+        const bool bSaved = Story->SaveGame(this);
+        if (GEngine)
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 2.0f, bSaved ? FColor::Green : FColor::Red,
+                bSaved ? TEXT("Partida guardada") : TEXT("No se pudo guardar"));
+        }
+    }
+}
+
+void ATurnoPlayerCharacter::LoadProgress()
+{
+    if (UTurnoStorySubsystem* Story = GetWorld()->GetSubsystem<UTurnoStorySubsystem>())
+    {
+        const bool bLoaded = Story->LoadGame(this);
+        if (GEngine)
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 2.0f, bLoaded ? FColor::Green : FColor::Red,
+                bLoaded ? TEXT("Partida cargada") : TEXT("No hay partida guardada"));
+        }
+    }
 }
