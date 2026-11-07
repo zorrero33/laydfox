@@ -426,7 +426,7 @@ function solvePhase(n){
  updateObjective();
 }
 function enterDirectorCode(){
- const value=$('doorCode').value.trim();
+ const value=$('codeInput').value.trim();
  if(value==='0317'&&state.clockCode&&state.generator){
   state.directorCode=true;closePanel('codePanel');animateDoor(doors.doorDirector,true);toast('Código aceptado. La puerta de dirección se abre.');soundDoor();
  }else{$('codeFeedback').textContent='Código incorrecto. Comprueba la nota del reloj.';soundError();}
