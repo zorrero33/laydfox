@@ -26,7 +26,7 @@ public:
     bool HasStoryFlag(FName FlagId) const;
 
     UFUNCTION(BlueprintCallable, Category="Turno|Save")
-    bool SaveGame(AActor* Player, FName SlotName = TEXT("TurnoAutoSave"));
+    bool SaveGame(AActor* Player, FName SlotName = NAME_None);
 
     UFUNCTION(BlueprintCallable, Category="Turno|Save")
     bool LoadGame(AActor* Player, FName SlotName = TEXT("TurnoAutoSave"));
