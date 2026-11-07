@@ -267,12 +267,6 @@ function buildWorld(){
  doors.doorReception.opened=true;doors.doorReception.progress=1;doors.doorReception.openTarget=1;
  colliderList.splice(colliderList.indexOf(doors.doorReception.collider),1);
  doors.doorReception.group.position.z+=2.35;
- makeInteractable('doorMorgue','Abrir puerta de la morgue',[6,1.25,-30]);
- makeInteractable('doorBasement','Abrir puerta del sótano',[-6,1.25,-30]);
- makeInteractable('doorDirector','Abrir puerta de dirección',[-6,1.25,-44]);
- makeInteractable('doorWard','Abrir puerta de enfermería',[6,1.25,10]);
- makeInteractable('door317','Abrir habitación 317',[6,1.25,-10]);
- makeInteractable('doorArchive','Abrir archivo médico',[-6,1.25,-10]);
  makeInteractable('alma','Hablar con Alma',[1,1.1,-15]);
 }
 function distance2(a,b){return Math.hypot(a.x-b.x,a.z-b.z);}
