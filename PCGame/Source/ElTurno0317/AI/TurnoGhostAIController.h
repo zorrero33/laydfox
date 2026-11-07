@@ -2,12 +2,12 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include "Perception/AIPerceptionTypes.h"
 #include "TurnoGhostAIController.generated.h"
 
 class UAIPerceptionComponent;
 class UAISenseConfig_Sight;
 class UAISenseConfig_Hearing;
-struct FAIStimulus;
 
 UCLASS()
 class ELTURNO0317_API ATurnoGhostAIController : public AAIController
