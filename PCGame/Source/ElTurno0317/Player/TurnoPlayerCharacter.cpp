@@ -148,6 +148,7 @@ void ATurnoPlayerCharacter::SetFlashlightBattery(float NewBattery)
 }
 void ATurnoPlayerCharacter::SaveProgress()
 {
+    if (!GetWorld()) return;
     if (UTurnoStorySubsystem* Story = GetWorld()->GetSubsystem<UTurnoStorySubsystem>())
     {
         const bool bSaved = Story->SaveGame(this);
@@ -161,6 +162,7 @@ void ATurnoPlayerCharacter::SaveProgress()
 
 void ATurnoPlayerCharacter::LoadProgress()
 {
+    if (!GetWorld()) return;
     if (UTurnoStorySubsystem* Story = GetWorld()->GetSubsystem<UTurnoStorySubsystem>())
     {
         const bool bLoaded = Story->LoadGame(this);
