@@ -5,6 +5,15 @@ Rama: `pc-ue5-dev`
 
 ## Comprobaciones realizadas
 
+Última verificación estática de la rama:
+- JSON del descriptor Unreal: válido.
+- Módulo registrado: `ElTurno0317`.
+- Plugin innecesario `GameplayCameras`: retirado; queda Enhanced Input habilitado.
+- F5/F9 aparecen en líneas separadas de configuración.
+- Sin concatenación accidental en `DefaultInput.ini`.
+- Llaves equilibradas en los CPP principales revisados.
+- El test de inventario existe como fuente, pero no se ha ejecutado.
+
 | Comprobación | Resultado | Evidencia / alcance |
 |---|---|---|
 | Descriptor `.uproject` | PASS | JSON parseado correctamente tras quitar plugin no utilizado |
