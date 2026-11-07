@@ -1,37 +1,58 @@
 # EL TURNO DE LAS 03:17
 
-Experiencia de terror en primera persona para navegador. Publicación estática en GitHub Pages.
+Experiencia de terror psicológico 3D para navegador, publicada de forma estática con GitHub Pages.
 
 ## Jugar
-https://zorrero33.github.io/laydfox/
+
+**URL pública:** https://zorrero33.github.io/laydfox/
+
+La página carga Three.js desde el archivo local `vendor/three.min.js`. El juego no depende de una CDN externa para el motor.
 
 ## Controles
-- WASD: moverse
-- Ratón: mirar
-- Mayús: correr
-- E: interactuar
-- F: linterna
-- Tab: inventario
-- Esc: pausa
 
-## Contenido implementado en esta versión
-- Renderizador 3D WebGL propio, sin librerías externas de motor.
-- Hospital procedural: recepción, pasillo principal, habitaciones, enfermería, archivo, quirófano y sótano.
-- Atrezo médico procedural: camas, carros, taquillas, camillas, monitores, generador, mobiliario y señalética.
-- Exploración, llaves, fusible, documentos, puzle eléctrico 1-3-2, linterna y batería.
-- Celador perseguidor, escondites, muerte y reintento.
-- Seis etapas narrativas y tres decisiones de final.
-- Guardado local en el navegador.
+- WASD: moverse.
+- Ratón: mirar (clic dentro del juego para capturar el puntero).
+- Mayús: correr.
+- Ctrl: agacharse.
+- E: interactuar.
+- F: linterna.
+- Tab: inventario y diario.
+- F5: guardar.
+- F9: cargar.
+- Esc: pausa y ajustes.
 
-## Limitaciones conocidas
-Es una versión 3D procedural jugable, no un producto AAA fotorrealista. Los personajes son modelos geométricos provisionales, sin rig facial ni animaciones de captura de movimiento. El audio espacial, las texturas PBR de alta resolución, los modelos humanos realistas, el doblaje y las pruebas exhaustivas en distintos equipos siguen pendientes. El proyecto Blender/GLB de Santa Aurelia se mantiene separado en Higgsfield 3D Jutsu.
+## Contenido de la versión web actual
 
+- Escenario 3D WebGL construido con Three.js.
+- Hospital conectado con recepción, enfermería, pediatría/habitación 317, archivo médico, morgue, sótano técnico y dirección.
+- Atrezo médico procedural: camas, camillas, monitores, soportes IV, carros, armarios, estanterías, mesas, generador y señalética.
+- Personajes 3D procedurales provisionales de Alma y el celador.
+- Movimiento en primera persona, correr, agacharse, colisiones, puertas deslizantes y escondite.
+- Linterna con batería y resistencia de carrera.
+- Inventario/diario de pruebas, documentos y pistas.
+- Puzle eléctrico con secuencia 1-3-2.
+- Código final de acceso 0317.
+- Apariciones de Alma, persecución del celador, eventos de 03:17 y audio procedural.
+- Seis capítulos narrativos y tres finales.
+- Guardado/carga local en el navegador.
+- Ajustes de volumen y sensibilidad de ratón.
 
-## Recursos 3D investigados (pendientes de integrar)
+## Estado y límites conocidos
 
-- [Hospital Bed — Grab3D](https://grab3d.com/models/furniture/hospital-bed/): GLB, CC0 1.0 según la ficha del autor. No está incluido todavía.
-- [Hospital Kit — Shuriken Studio](https://shuriken.studio/kits/hospital): 21 modelos GLB bajo la licencia gratuita indicada por el autor. Revisar y conservar el texto de licencia antes de redistribuir. No está incluido todavía.
-- [Khronos glTF Sample Assets](https://github.khronos.org/glTF-Assets/): catálogo de referencia; comprobar la licencia de cada modelo.
-- [Poly Haven — Concrete Tiles](https://polyhaven.com/a/concrete_tiles): textura PBR pendiente de integrar.
+Esta es una **versión web jugable de la historia**, no la entrega AAA final descrita en la biblia de producción.
 
-Estos enlaces son referencias de producción, no activos descargados ni integrados. La versión actual sigue usando geometría procedural para mobiliario y personajes.
+Los escenarios y personajes de esta versión usan geometría procedural de Three.js. Alma y el celador no tienen todavía mallas humanas fotorrealistas, esqueletos completos ni animación facial. No hay captura de movimiento, doblaje, modelos GLB hospitalarios comerciales integrados, ni campaña de 8–12 capítulos. La campaña web actual mantiene seis capítulos y tres finales. Los modelos y recursos fotorrealistas siguen pendientes.
+
+Se han comprobado estáticamente la sintaxis JavaScript, la existencia de los elementos de interfaz usados por el código, el cierre de CSS y las rutas relativas locales. **No se ha podido ejecutar una prueba de navegador real ni validar la experiencia en distintos equipos desde este entorno.** Por eso, el enlace corresponde al despliegue configurado en GitHub Pages, pero la carga final y la experiencia de juego deben confirmarse abriendo la página en un navegador.
+
+## Proyecto de PC
+
+La producción separada de Unreal Engine está en la rama `pc-ue5-dev`:
+
+https://github.com/zorrero33/laydfox/tree/pc-ue5-dev/PCGame
+
+Esta rama no sustituye la página web ni se compila automáticamente como ejecutable.
+
+## Licencia del motor
+
+Three.js r160 está incluido con su aviso de licencia MIT en `vendor/THREE-LICENSE.txt`. Los elementos procedurales de este proyecto son propios; no se afirma que los assets pendientes estén descargados o integrados.
