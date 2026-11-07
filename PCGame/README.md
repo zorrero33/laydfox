@@ -8,7 +8,7 @@ Esta carpeta inicia la rama de producción del juego de PC. Está separada de la
 
 ## Estado real de esta entrega
 
-- Proyecto C++ y módulos iniciales: en construcción.
+- Proyecto C++ y módulos iniciales: descriptor, targets, módulo, personaje FPS, linterna, interacción, inventario de evidencias, guardado/carga, capítulo, actor de evidencia y controlador de percepción del celador añadidos a la rama.
 - Proyecto Unreal compilado en este entorno: **no**; Unreal Editor, Unreal Build Tool y toolchain de Windows no están instalados aquí.
 - Ejecutable Windows: **no existe todavía**.
 - Escenario 3D en 3D Jutsu: existe una escena de Hospital Santa Aurelia con revisión 7 y export GLB/Blend disponible desde el proyecto 3D enlazado en el informe de auditoría.
@@ -23,11 +23,11 @@ No se debe etiquetar esta carpeta como juego terminado hasta compilar, jugar y s
 2. Instalar Visual Studio 2022 o Visual Studio 2026 con el workload de desarrollo C++ para juegos.
 3. Abrir `ElTurno0317.uproject`.
 4. Permitir la generación de archivos de proyecto y compilar el módulo `ElTurno0317`.
-5. Crear/abrir el mapa principal cuando se incorpore el contenido 3D final.
+5. Crear/abrir el mapa principal cuando se incorpore el contenido 3D final. El proyecto aún no tiene un mapa empaquetado ni assets humanos finales.
 
 ## Controles iniciales previstos
 
-WASD mover · Ratón mirar · Mayús correr · Ctrl agacharse · E interactuar · F linterna · Tab inventario/diario · Esc pausa.
+WASD mover · Ratón mirar · Mayús correr · Ctrl agacharse · E interactuar · F linterna · F5 guardar · F9 cargar. Tab inventario/diario y Esc pausa aún pendientes.
 
 ## Estructura
 
