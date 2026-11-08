@@ -34,7 +34,7 @@ let keys=new Set(),moving=false,sprinting=false,crouching=false,lastTime=0,phase
 let audioCtx=null,audioMaster=null,droneOsc=null,droneGain=null;
 let volume=.45,sensitivity=.0021;
 const SAVE_KEY='santa0317_web_2026';
-function makeState(){return {chapter:1,key:false,fuse:false,protocol:false,power:false,ward:false,record:false,room317:false,drawing:false,photo:false,almaMet:false,archive:false,incident:false,morgue:false,securityTape:false,clockCode:false,basement:false,generator:false,directorCode:false,directorEvidence:false,paranormal:false,secretClues:0,items:[],flags:[],checkpoint:{x:-11,z:25.5,yaw:0},ending:null};}
+function makeState(){return {chapter:1,key:false,fuse:false,protocol:false,power:false,ward:false,record:false,room317:false,drawing:false,photo:false,almaMet:false,archive:false,incident:false,morgue:false,securityTape:false,clockCode:false,basement:false,generator:false,directorCode:false,directorEvidence:false,paranormal:false,secretClues:0,batteriesTaken:false,items:[],flags:[],checkpoint:{x:-11,z:25.5,yaw:0},ending:null};}
 function mat(name,color,rough=.78,metal=0,emissive=0){
  if(materials[name])return materials[name];
  const m=new THREE.MeshStandardMaterial({color,roughness:rough,metalness:metal,emissive:color,emissiveIntensity:emissive});
@@ -321,14 +321,14 @@ function renderInventory(){
 }
 function saveGame(){
  try{
-  const payload={version:2,state,player:{x:player.x,z:player.z,yaw:player.yaw,pitch:player.pitch},flashBattery,gameMinutes,enemy:{x:enemy.position.x,z:enemy.position.z,visible:enemy.visible}};
+  const payload={version:2,state,player:{x:player.x,z:player.z,yaw:player.yaw,pitch:player.pitch},flashBattery,flashOn,stamina,hidden,gameMinutes,enemy:{x:enemy.position.x,z:enemy.position.z,visible:enemy.visible}};
   localStorage.setItem(SAVE_KEY,JSON.stringify(payload));toast('Partida guardada en este navegador.');$('continueButton').disabled=false;return true;
  }catch(e){toast('No se pudo guardar: '+e.message);return false;}
 }
 function loadGame(){
  try{
   const raw=localStorage.getItem(SAVE_KEY);if(!raw)return false;const s=JSON.parse(raw);if(!s||s.version!==2)return false;
-  state=Object.assign(makeState(),s.state||{});Object.assign(player,s.player||{});flashBattery=Number(s.flashBattery??100);gameMinutes=Number(s.gameMinutes||0);
+  state=Object.assign(makeState(),s.state||{});Object.assign(player,s.player||{});flashBattery=Math.max(0,Math.min(100,Number(s.flashBattery??100)));flashOn=s.flashOn!==false&&flashBattery>0;stamina=Math.max(0,Math.min(100,Number(s.stamina??100)));hidden=!!s.hidden;gameMinutes=Math.max(0,Number(s.gameMinutes||0));
   if(s.enemy){enemy.position.set(s.enemy.x||0,0,s.enemy.z||-36);enemy.visible=!!s.enemy.visible;}
   syncWorldState();return true;
  }catch(e){toast('La partida guardada no se puede leer.');return false;}
@@ -381,37 +381,37 @@ function interact(o){
  if(!o)return;
  switch(o.id){
  case'contract':
-  openDocument('CONTRATO DE SERVICIOS NOCTURNOS','HOSPITAL SANTA AURELIA\\n\\nContratista: Álex Rivas\\nHorario: 23:00–06:00\\nRemuneración: 50 € por hora.\\n\\nTareas: revisar incidencias, comprobar puertas y restablecer suministros.\\n\\nNota manuscrita: «Si el reloj se detiene a las 03:17, no contestes al teléfono».');
+  openDocument('CONTRATO DE SERVICIOS NOCTURNOS','HOSPITAL SANTA AURELIA\n\nContratista: Álex Rivas\nHorario: 23:00–06:00\nRemuneración: 50 € por hora.\n\nTareas: revisar incidencias, comprobar puertas y restablecer suministros.\n\nNota manuscrita: «Si el reloj se detiene a las 03:17, no contestes al teléfono».');
   if(!state.flags.includes('contract')){state.flags.push('contract');addEvidence('Contrato nocturno','Álex Rivas · turno 23:00–06:00 · 50 €/hora.');}break;
  case'key':
   if(state.key){toast('Ya tienes el llavero.');break;}state.key=true;addEvidence('Llavero de mantenimiento','Llaves de servicio y acceso a zonas restringidas.');toast('Has recogido el llavero.');break;
  case'fuse':
   if(!state.key){toast('Primero recoge el llavero de mantenimiento.');break;}if(state.fuse){toast('Ya has recogido el fusible.');break;}state.fuse=true;addEvidence('Fusible cerámico','Repuesto de 16 amperios para el cuadro B.');toast('Fusible recogido.');break;
  case'protocol':
-  state.protocol=true;addEvidence('Protocolo de rearme','Cuadro B: activar las fases en orden 1 → 3 → 2.');openDocument('PROTOCOLO DE REARME','CUADRO B — MANTENIMIENTO\\n\\nSustituir el fusible cerámico. Activar fases en orden: 1 → 3 → 2.\\n\\nFirma: D. Salvatierra · 2006.');break;
+  state.protocol=true;addEvidence('Protocolo de rearme','Cuadro B: activar las fases en orden 1 → 3 → 2.');openDocument('PROTOCOLO DE REARME','CUADRO B — MANTENIMIENTO\n\nSustituir el fusible cerámico. Activar fases en orden: 1 → 3 → 2.\n\nFirma: D. Salvatierra · 2006.');break;
  case'panel':
   if(!state.fuse||!state.protocol){toast('Necesitas el fusible y el protocolo.');break;}phaseInput=[];$('phaseFeedback').textContent='Introduce 1 → 3 → 2.';openPanel('puzzlePanel');break;
  case'doorWard':case'door317':case'doorArchive':case'doorMorgue':case'doorBasement':case'doorDirector':handleDoor(o.id);break;
  case'record':
-  if(!state.ward){toast('La puerta de enfermería sigue cerrada.');break;}state.record=true;addEvidence('Registro de enfermería','Alma S. · ocho años · ingreso 14/09/2006.');openDocument('REGISTRO DE ENFERMERÍA · 2006','PACIENTE: ALMA S. · 8 AÑOS\\n\\nIngreso: 21:40. Tutor legal: Daniel S.\\n\\nLa menor solicita que no se avise a su padre.\\n\\nNota: «La niña repite que el doctor no es su padre».');chapter(3,'HABITACIÓN 317','LA NIÑA DEL DIBUJO');enemy.visible=true;subtitle('Una puerta golpea al fondo del pasillo.');break;
+  if(!state.ward){toast('La puerta de enfermería sigue cerrada.');break;}state.record=true;addEvidence('Registro de enfermería','Alma S. · ocho años · ingreso 14/09/2006.');openDocument('REGISTRO DE ENFERMERÍA · 2006','PACIENTE: ALMA S. · 8 AÑOS\n\nIngreso: 21:40. Tutor legal: Daniel S.\n\nLa menor solicita que no se avise a su padre.\n\nNota: «La niña repite que el doctor no es su padre».');chapter(3,'HABITACIÓN 317','LA NIÑA DEL DIBUJO');enemy.visible=true;subtitle('Una puerta golpea al fondo del pasillo.');break;
  case'drawing':
-  if(!state.room317){toast('La puerta 317 sigue cerrada.');break;}state.drawing=true;if(alma)alma.visible=true;state.secretClues++;addEvidence('Dibujo infantil','Tres figuras frente a una ventana. «Mamá, ven a buscarme».');openDocument('DIBUJO INFANTIL','Una casa. Tres figuras frente a una ventana.\\n\\n«PAPÁ DICE QUE A LAS 03:17 TODO SE ACABA».\\n\\nEn el margen: «Mamá, ven a buscarme».');subtitle('ALMA, muy cerca: No le digas que estoy aquí…');break;
+  if(!state.room317){toast('La puerta 317 sigue cerrada.');break;}if(state.drawing){toast('Ya has examinado el dibujo.');break;}state.drawing=true;if(alma)alma.visible=true;state.secretClues++;addEvidence('Dibujo infantil','Tres figuras frente a una ventana. «Mamá, ven a buscarme».');openDocument('DIBUJO INFANTIL','Una casa. Tres figuras frente a una ventana.\n\n«PAPÁ DICE QUE A LAS 03:17 TODO SE ACABA».\n\nEn el margen: «Mamá, ven a buscarme».');subtitle('ALMA, muy cerca: No le digas que estoy aquí…');break;
  case'photo':
-  if(!state.drawing){toast('Examina primero el dibujo infantil.');break;}state.photo=true;state.secretClues++;addEvidence('Fotografía familiar','Daniel, Lucía y Alma. En el reverso aparece una fecha de análisis genético.');openDocument('FOTOGRAFÍA FAMILIAR','Daniel y Lucía junto a Alma.\\n\\nEn el reverso: «Prueba de ADN recibida. Daniel aún no lo sabe».');break;
+  if(!state.drawing){toast('Examina primero el dibujo infantil.');break;}if(state.photo){toast('Ya has examinado la fotografía.');break;}state.photo=true;state.secretClues++;addEvidence('Fotografía familiar','Daniel, Lucía y Alma. En el reverso aparece una fecha de análisis genético.');openDocument('FOTOGRAFÍA FAMILIAR','Daniel y Lucía junto a Alma.\n\nEn el reverso: «Prueba de ADN recibida. Daniel aún no lo sabe».');break;
  case'alma':
-  if(!state.drawing){toast('La figura se desvanece.');break;}state.almaMet=true;state.secretClues++;addEvidence('Recuerdo de Alma','«El celador no quiere que encuentres la cinta. Busca las luces rojas».');subtitle('ALMA: Él cerró la puerta. La llave no estaba con él…');toast('Alma te ha dejado una pista.');break;
+  if(!state.drawing){toast('La figura se desvanece.');break;}if(state.almaMet){toast('Alma ya te ha contado su recuerdo.');break;}state.almaMet=true;state.secretClues++;addEvidence('Recuerdo de Alma','«El celador no quiere que encuentres la cinta. Busca las luces rojas».');subtitle('ALMA: Él cerró la puerta. La llave no estaba con él…');toast('Alma te ha dejado una pista.');break;
  case'archiveDoc':
-  if(!state.archive){toast('El archivo médico está cerrado.');break;}state.incident=true;addEvidence('Expediente 14/09/2006','Daniel entró en la habitación 317 a las 03:12. La muerte se registró a las 03:17.');openDocument('EXPEDIENTE 14/09/2006','El doctor Daniel Salvatierra accedió a la habitación 317 a las 03:12. La paciente falleció a las 03:17.\\n\\nLa investigación interna fue cerrada por orden de dirección.\\n\\nNota: «No registrar la discusión sobre el resultado de ADN».');chapter(4,'LOS ARCHIVOS','EL INFORME ORIGINAL');enemy.visible=true;subtitle('CELADOR: No deberías haber abierto ese archivo.');break;
+  if(!state.archive){toast('El archivo médico está cerrado.');break;}state.incident=true;addEvidence('Expediente 14/09/2006','Daniel entró en la habitación 317 a las 03:12. La muerte se registró a las 03:17.');openDocument('EXPEDIENTE 14/09/2006','El doctor Daniel Salvatierra accedió a la habitación 317 a las 03:12. La paciente falleció a las 03:17.\n\nLa investigación interna fue cerrada por orden de dirección.\n\nNota: «No registrar la discusión sobre el resultado de ADN».');chapter(4,'LOS ARCHIVOS','EL INFORME ORIGINAL');enemy.visible=true;subtitle('CELADOR: No deberías haber abierto ese archivo.');break;
  case'securityTape':
-  if(!state.morgue){toast('La morgue todavía no está abierta.');break;}state.securityTape=true;addEvidence('Cinta de vigilancia','Una cámara muestra a Daniel entrando en la habitación 317.');openDocument('REGISTRO DE SEGURIDAD · 03:17','03:12 — Daniel entra en la habitación 317.\\n03:16 — La señal pierde imagen.\\n03:17 — Tres pitidos. La cámara se apaga.\\n03:19 — Un celador recoge una llave que no figura en el inventario.');break;
+  if(!state.morgue){toast('La morgue todavía no está abierta.');break;}state.securityTape=true;addEvidence('Cinta de vigilancia','Una cámara muestra a Daniel entrando en la habitación 317.');openDocument('REGISTRO DE SEGURIDAD · 03:17','03:12 — Daniel entra en la habitación 317.\n03:16 — La señal pierde imagen.\n03:17 — Tres pitidos. La cámara se apaga.\n03:19 — Un celador recoge una llave que no figura en el inventario.');break;
  case'clockNote':
-  if(!state.morgue){toast('La morgue todavía no está abierta.');break;}state.clockCode=true;addEvidence('Nota del reloj','La hora detenida en el reloj: 03:17.');openDocument('RELOJ DE LA MORGUE','El reloj está detenido a las 03:17.\\n\\nEn la parte posterior alguien escribió: «La última puerta abre con la hora».\\n\\nCódigo: 0317.');toast('Has descubierto el código 0317.');break;
+  if(!state.morgue){toast('La morgue todavía no está abierta.');break;}state.clockCode=true;addEvidence('Nota del reloj','La hora detenida en el reloj: 03:17.');openDocument('RELOJ DE LA MORGUE','El reloj está detenido a las 03:17.\n\nEn la parte posterior alguien escribió: «La última puerta abre con la hora».\n\nCódigo: 0317.');toast('Has descubierto el código 0317.');break;
  case'generator':
-  if(!state.basement){toast('La sala técnica está cerrada.');break;}if(state.generator){toast('El generador ya está funcionando.');break;}state.generator=true;addEvidence('Registro del generador','La energía del ala norte se restauró a las 03:17.');openDocument('GENERADOR DE EMERGENCIA','El interruptor se resiste. Al activarlo, el edificio entero vibra.\\n\\nEn el panel: 03:17.\\n\\nUna grabación automática reproduce una voz infantil: «Papá, tengo miedo».');subtitle('CELADOR: Ahora ya sabes lo que pasó.');enemy.visible=true;break;
+  if(!state.basement){toast('La sala técnica está cerrada.');break;}if(state.generator){toast('El generador ya está funcionando.');break;}state.generator=true;addEvidence('Registro del generador','La energía del ala norte se restauró a las 03:17.');openDocument('GENERADOR DE EMERGENCIA','El interruptor se resiste. Al activarlo, el edificio entero vibra.\n\nEn el panel: 03:17.\n\nUna grabación automática reproduce una voz infantil: «Papá, tengo miedo».');subtitle('CELADOR: Ahora ya sabes lo que pasó.');enemy.visible=true;break;
  case'directorFile':
-  if(!state.directorCode){toast('La puerta de dirección está cerrada.');break;}state.directorEvidence=true;addEvidence('Expediente original','La dirección ordenó cerrar la investigación y alterar el registro.');openDocument('EXPEDIENTE ORIGINAL · DANIEL SALVATIERRA','La prueba genética fue recibida el 14/09/2006.\\n\\nDaniel descubrió que no era el padre biológico de Alma.\\n\\nLa discusión en la habitación 317 fue ocultada por la dirección. El celador recibió instrucciones para retirar la cinta.\\n\\nA las 03:17, Alma dejó de responder.');break;
+  if(!state.directorCode){toast('La puerta de dirección está cerrada.');break;}state.directorEvidence=true;addEvidence('Expediente original','La dirección ordenó cerrar la investigación y alterar el registro.');openDocument('EXPEDIENTE ORIGINAL · DANIEL SALVATIERRA','La prueba genética fue recibida el 14/09/2006.\n\nDaniel descubrió que no era el padre biológico de Alma.\n\nLa discusión en la habitación 317 fue ocultada por la dirección. El celador recibió instrucciones para retirar la cinta.\n\nA las 03:17, Alma dejó de responder.');break;
  case'batteries':
-  flashBattery=Math.min(100,flashBattery+45);toast('Pilas recogidas. Linterna al '+Math.round(flashBattery)+'%.');break;
+  if(state.batteriesTaken){toast('Ya has recogido estas pilas.');break;}state.batteriesTaken=true;flashBattery=Math.min(100,flashBattery+45);toast('Pilas recogidas. Linterna al '+Math.round(flashBattery)+'%.');break;
  case'hideSpot':
   hidden=!hidden;toast(hidden?'Te ocultas dentro del armario.':'Sales del escondite.');if(hidden)subtitle('Contén la respiración.');break;
  }
