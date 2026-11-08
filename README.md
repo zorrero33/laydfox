@@ -6,7 +6,7 @@ Experiencia de terror psicológico 3D para navegador, publicada de forma estáti
 
 **URL pública:** https://zorrero33.github.io/laydfox/
 
-La página carga Three.js desde el archivo local `vendor/three.min.js`. El juego no depende de una CDN externa para el motor.
+La página carga Three.js y GLTFLoader desde archivos locales de `vendor/`. Los modelos de Alma y del celador se reconstruyen desde los dos fragmentos GLB locales de `assets/`; no se descarga contenido desde una CDN ni desde una URL temporal de 3D Jutsu para iniciar la partida.
 
 ## Controles
 
@@ -33,24 +33,28 @@ La página carga Three.js desde el archivo local `vendor/three.min.js`. El juego
 - Puzle eléctrico con secuencia 1-3-2.
 - Código final de acceso 0317.
 - Apariciones de Alma, persecución del celador, eventos de 03:17 y audio procedural.
-- Ocho capítulos narrativos, tres finales principales y un recuerdo secreto desbloqueable.
+- Ocho capítulos narrativos, tres finales principales y un recuerdo secreto desbloqueable tras reunir las tres pistas de Alma.
 - Guardado/carga local en el navegador.
 - Ajustes de volumen y sensibilidad de ratón.
 
 ## Verificación técnica de esta revisión
 
-- La web se ha abierto con Chromium y WebGL activado: carga Three.js, inicia una partida y muestra el HUD.
-- Se han probado el inventario, pausa, ajustes, guardado F5 y carga F9.
-- El flujo de campaña se ha recorrido mediante pruebas automatizadas de los eventos de juego: las ocho fases, las puertas bloqueadas, la cinta, la nota 03:17, el generador, la cerradura del director y el final de la verdad con recuerdo secreto.
-- En esas pruebas no se detectaron errores JavaScript ni recursos fallidos. Esto no sustituye una prueba de juego manual en distintos ordenadores y navegadores.
+- La web se ha abierto con Chromium y WebGL activado: cargan Three.js, GLTFLoader y ambos modelos GLB locales.
+- Se ha probado el inicio de partida, el HUD, la apertura/cierre del inventario, los menús de pausa/ajustes y el nuevo comportamiento de Esc para pausar y reanudar.
+- Se han probado guardado F5, carga F9 y actualización de objetivos después de leer el contrato.
+- El flujo automatizado recorre los ocho capítulos, sus puertas y bloqueos, el puzle eléctrico, la cinta, la nota 03:17, el generador, el código del despacho, los tres finales y el recuerdo secreto.
+- Se ha comprobado el diseño a 390 px de ancho sin desbordamiento horizontal.
+- En estas pruebas no se detectaron errores JavaScript ni peticiones fallidas. No equivalen a una prueba manual prolongada en el ordenador del jugador ni a una matriz completa de compatibilidad.
 
 ## Estado y límites conocidos
 
 Esta es una **versión web jugable de la historia**, no la entrega AAA final descrita en la biblia de producción.
 
-El hospital y la mayor parte del atrezo siguen usando geometría procedural de Three.js. Alma y el celador ya cargan mallas GLB 3D locales (17 piezas por personaje y materiales propios del modelo), con modelos procedurales de respaldo; sin embargo, esos GLB no contienen esqueletos (`skins`) ni animaciones exportadas, por lo que se desplazan y giran como una sola figura. No son modelos humanos fotorrealistas ni tienen animación facial. No hay captura de movimiento, doblaje, modelos GLB hospitalarios comerciales integrados, ni campaña de 8–12 capítulos. La campaña web actual mantiene seis capítulos y tres finales. Los rigs esqueléticos, la animación corporal avanzada, los modelos fotorrealistas, las cinemáticas y los recursos de audio/voz completos siguen pendientes.
+El hospital y la mayor parte del atrezo siguen usando geometría procedural de Three.js. Alma y el celador cargan mallas GLB 3D locales de 17 piezas cada personaje, con sus materiales y modelos procedurales de respaldo. Los modelos no contienen esqueletos (`skins`) ni animaciones exportadas: se desplazan y giran como una figura rígida. No son humanos fotorrealistas ni tienen animación facial, captura de movimiento o doblaje.
 
-Además de la auditoría estática, esta revisión sí se ha ejecutado en Chromium con WebGL SwiftShader. La prueba cubre el arranque, la interfaz, las funciones de guardado/carga y el flujo automatizado de los ocho capítulos. No se ha realizado todavía una prueba manual prolongada en el equipo del jugador ni una matriz de compatibilidad con todos los navegadores y tarjetas gráficas.
+La campaña web contiene **ocho capítulos** y tres finales, además del recuerdo secreto de Alma. No llega todavía a los **30 puzles independientes** del documento de producción: incluye el cuadro eléctrico 1→3→2, el código 0317 y varias pruebas, documentos y bloqueos de progresión. Las cinemáticas completas, los rigs esqueléticos, la animación corporal avanzada, los modelos fotorrealistas y una banda sonora/voz profesional siguen pendientes.
+
+La experiencia se ha comprobado en Chromium con WebGL SwiftShader, incluidas las cargas locales de los personajes, los controles, la interfaz, guardado/carga, el recorrido automatizado de la campaña y los finales. No se ha realizado todavía una prueba manual prolongada en el ordenador del jugador ni una matriz completa de compatibilidad con todos los navegadores y tarjetas gráficas. Los controles principales están orientados a teclado y ratón; no hay un esquema táctil de móvil.
 
 ## Proyecto de PC
 
