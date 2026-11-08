@@ -231,19 +231,26 @@ function createPorter(){
 function loadCharacterMeshes(){
  if(!THREE.GLTFLoader)return;
  const loader=new THREE.GLTFLoader();
- loader.load('./assets/0317-characters.glb?v=20261108-2',gltf=>{
-  const pairs=[['CHARACTER_ALMA',alma],['CHARACTER_NIGHT_PORTER',enemy]];
-  for(const [name,target] of pairs){
-   const source=gltf.scene.getObjectByName(name);
-   if(!source||!target)continue;
-   const model=source.clone(true);model.name=name+'_IMPORTED';
-   model.traverse(o=>{
-    if(o.isMesh){o.castShadow=true;o.receiveShadow=true;o.frustumCulled=true;}
-   });
-   for(const child of target.children)child.visible=false;
-   target.add(model);target.userData.importedCharacter=true;
-  }
- },undefined,error=>console.warn('Modelos 3D externos de personaje no disponibles; se mantienen los modelos de reserva.',error));
+ const parts=['./assets/character-models-01.b64?v=20261108-2','./assets/character-models-02.b64?v=20261108-2'];
+ Promise.all(parts.map(async url=>{
+  const response=await fetch(url,{cache:'force-cache'});
+  if(!response.ok)throw new Error('No se pudo cargar '+url+' ('+response.status+').');
+  return (await response.text()).trim();
+ })).then(chunks=>{
+  const encoded=chunks.join(''),binary=atob(encoded),buffer=new ArrayBuffer(binary.length),bytes=new Uint8Array(buffer);
+  for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+  loader.parse(buffer,'',gltf=>{
+   const pairs=[['CHARACTER_ALMA',alma],['CHARACTER_NIGHT_PORTER',enemy]];
+   for(const [name,target] of pairs){
+    const source=gltf.scene.getObjectByName(name);
+    if(!source||!target)continue;
+    const model=source.clone(true);model.name=name+'_IMPORTED';
+    model.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;o.frustumCulled=true;}});
+    for(const child of target.children)child.visible=false;
+    target.add(model);target.userData.importedCharacter=true;
+   }
+  },error=>console.warn('No se pudieron interpretar los modelos 3D; se mantienen los personajes de reserva.',error));
+ }).catch(error=>console.warn('Modelos 3D locales no disponibles; se mantienen los personajes de reserva.',error));
 }
 function addLampRow(z){
  const fixture=addBox('fluorescent fixture',[0,2.92,z],[2.1,.07,.42],M.steel,false);
