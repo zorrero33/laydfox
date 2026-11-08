@@ -26,7 +26,7 @@ La página carga Three.js desde el archivo local `vendor/three.min.js`. El juego
 - Escenario 3D WebGL construido con Three.js.
 - Hospital conectado con recepción, enfermería, pediatría/habitación 317, archivo médico, morgue, sótano técnico y dirección.
 - Atrezo médico procedural: camas, camillas, monitores, soportes IV, carros, armarios, estanterías, mesas, generador y señalética.
-- Personajes 3D procedurales provisionales de Alma y el celador.
+- Modelos GLB locales de Alma y del celador, integrados como mallas 3D estáticas compuestas por 17 piezas cada uno; modelos procedurales de reserva si el GLB no carga.
 - Movimiento en primera persona, correr, agacharse, colisiones, puertas deslizantes y escondite.
 - Linterna con batería y resistencia de carrera.
 - Inventario/diario de pruebas, documentos y pistas.
@@ -48,7 +48,7 @@ La página carga Three.js desde el archivo local `vendor/three.min.js`. El juego
 
 Esta es una **versión web jugable de la historia**, no la entrega AAA final descrita en la biblia de producción.
 
-Los escenarios y personajes de esta versión usan geometría procedural de Three.js. Alma y el celador no tienen todavía mallas humanas fotorrealistas, esqueletos completos ni animación facial. No hay captura de movimiento, doblaje, modelos GLB hospitalarios comerciales integrados, ni campaña de 8–12 capítulos. La campaña web actual mantiene seis capítulos y tres finales. Los modelos y recursos fotorrealistas siguen pendientes.
+El hospital y la mayor parte del atrezo siguen usando geometría procedural de Three.js. Alma y el celador ya cargan mallas GLB 3D locales (17 piezas por personaje y materiales propios del modelo), con modelos procedurales de respaldo; sin embargo, esos GLB no contienen esqueletos (`skins`) ni animaciones exportadas, por lo que se desplazan y giran como una sola figura. No son modelos humanos fotorrealistas ni tienen animación facial. No hay captura de movimiento, doblaje, modelos GLB hospitalarios comerciales integrados, ni campaña de 8–12 capítulos. La campaña web actual mantiene seis capítulos y tres finales. Los rigs esqueléticos, la animación corporal avanzada, los modelos fotorrealistas, las cinemáticas y los recursos de audio/voz completos siguen pendientes.
 
 Además de la auditoría estática, esta revisión sí se ha ejecutado en Chromium con WebGL SwiftShader. La prueba cubre el arranque, la interfaz, las funciones de guardado/carga y el flujo automatizado de los ocho capítulos. No se ha realizado todavía una prueba manual prolongada en el equipo del jugador ni una matriz de compatibilidad con todos los navegadores y tarjetas gráficas.
 
