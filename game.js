@@ -603,7 +603,7 @@ function onKeyDown(e){
  if(e.code==='KeyE'&&started&&!modal)interact(nearestInteractable());
  if(e.code==='KeyF'&&started&&!modal){flashOn=!flashOn&&flashBattery>0;if(flashBattery<=0)toast('No queda batería.');else toast(flashOn?'Linterna encendida.':'Linterna apagada.');}
  if(e.code==='Tab'&&started){if(modal==='inventoryPanel'){closePanel('inventoryPanel');lockPointer();}else{renderInventory();openPanel('inventoryPanel');}}
- if(e.code==='Escape'&&started){if(modal){closePanel(modal);modal='';}else{paused=true;openPanel('pausePanel');}}
+ if(e.code==='Escape'&&started){if(modal==='pausePanel'){closePanel('pausePanel');paused=false;lockPointer();}else if(modal){closePanel(modal);modal='';if(!paused)lockPointer();}else{paused=true;openPanel('pausePanel');}}
  if(e.code==='F5'&&started){saveGame();}
  if(e.code==='F9'&&started){if(loadGame())toast('Partida cargada.');else toast('No hay partida guardada.');}
 }
