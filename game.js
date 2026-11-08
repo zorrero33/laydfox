@@ -228,6 +228,23 @@ function createPorter(){
  const glow=new THREE.PointLight(0x263c3c,.25,2);glow.position.set(0,1,0);g.add(glow);
  g.position.set(0,0,-36);g.visible=false;scene.add(g);return g;
 }
+function loadCharacterMeshes(){
+ if(!THREE.GLTFLoader)return;
+ const loader=new THREE.GLTFLoader();
+ loader.load('./assets/0317-characters.glb',gltf=>{
+  const pairs=[['CHARACTER_ALMA',alma],['CHARACTER_NIGHT_PORTER',enemy]];
+  for(const [name,target] of pairs){
+   const source=gltf.scene.getObjectByName(name);
+   if(!source||!target)continue;
+   const model=source.clone(true);model.name=name+'_IMPORTED';
+   model.traverse(o=>{
+    if(o.isMesh){o.castShadow=true;o.receiveShadow=true;o.frustumCulled=true;}
+   });
+   for(const child of target.children)child.visible=false;
+   target.add(model);target.userData.importedCharacter=true;
+  }
+ },undefined,error=>console.warn('Modelos 3D externos de personaje no disponibles; se mantienen los modelos de reserva.',error));
+}
 function addLampRow(z){
  const fixture=addBox('fluorescent fixture',[0,2.92,z],[2.1,.07,.42],M.steel,false);
  const diffuser=addBox('fluorescent diffuser',[0,2.87,z],[1.9,.035,.31],M.lamp,false);
@@ -262,7 +279,7 @@ function buildWorld(){
   light('emergency spill '+idx,[-5.2,2.15,z],0xb52d24,1.5,5);
  }
  makeWallPicture([5.85,1.8,1],['PLANTA NORTE','ACCESO RESTRINGIDO']);
- alma=createAlma();enemy=createPorter();
+ alma=createAlma();enemy=createPorter();loadCharacterMeshes();
  // Doors start closed. Reception door is permanently open for the start area.
  doors.doorReception.opened=true;doors.doorReception.progress=1;doors.doorReception.openTarget=1;
  colliderList.splice(colliderList.indexOf(doors.doorReception.collider),1);
