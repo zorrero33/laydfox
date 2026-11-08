@@ -33,9 +33,16 @@ La página carga Three.js desde el archivo local `vendor/three.min.js`. El juego
 - Puzle eléctrico con secuencia 1-3-2.
 - Código final de acceso 0317.
 - Apariciones de Alma, persecución del celador, eventos de 03:17 y audio procedural.
-- Seis capítulos narrativos y tres finales.
+- Ocho capítulos narrativos, tres finales principales y un recuerdo secreto desbloqueable.
 - Guardado/carga local en el navegador.
 - Ajustes de volumen y sensibilidad de ratón.
+
+## Verificación técnica de esta revisión
+
+- La web se ha abierto con Chromium y WebGL activado: carga Three.js, inicia una partida y muestra el HUD.
+- Se han probado el inventario, pausa, ajustes, guardado F5 y carga F9.
+- El flujo de campaña se ha recorrido mediante pruebas automatizadas de los eventos de juego: las ocho fases, las puertas bloqueadas, la cinta, la nota 03:17, el generador, la cerradura del director y el final de la verdad con recuerdo secreto.
+- En esas pruebas no se detectaron errores JavaScript ni recursos fallidos. Esto no sustituye una prueba de juego manual en distintos ordenadores y navegadores.
 
 ## Estado y límites conocidos
 
@@ -43,7 +50,7 @@ Esta es una **versión web jugable de la historia**, no la entrega AAA final des
 
 Los escenarios y personajes de esta versión usan geometría procedural de Three.js. Alma y el celador no tienen todavía mallas humanas fotorrealistas, esqueletos completos ni animación facial. No hay captura de movimiento, doblaje, modelos GLB hospitalarios comerciales integrados, ni campaña de 8–12 capítulos. La campaña web actual mantiene seis capítulos y tres finales. Los modelos y recursos fotorrealistas siguen pendientes.
 
-Se han comprobado estáticamente la sintaxis JavaScript, la existencia de los elementos de interfaz usados por el código, el cierre de CSS y las rutas relativas locales. **No se ha podido ejecutar una prueba de navegador real ni validar la experiencia en distintos equipos desde este entorno.** Por eso, el enlace corresponde al despliegue configurado en GitHub Pages, pero la carga final y la experiencia de juego deben confirmarse abriendo la página en un navegador.
+Además de la auditoría estática, esta revisión sí se ha ejecutado en Chromium con WebGL SwiftShader. La prueba cubre el arranque, la interfaz, las funciones de guardado/carga y el flujo automatizado de los ocho capítulos. No se ha realizado todavía una prueba manual prolongada en el equipo del jugador ni una matriz de compatibilidad con todos los navegadores y tarjetas gráficas.
 
 ## Proyecto de PC
 
