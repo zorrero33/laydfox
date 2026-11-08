@@ -262,7 +262,7 @@ function buildWorld(){
   light('emergency spill '+idx,[-5.2,2.15,z],0xb52d24,1.5,5);
  }
  makeWallPicture([5.85,1.8,1],['PLANTA NORTE','ACCESO RESTRINGIDO']);
- createAlma();enemy=createPorter();
+ alma=createAlma();enemy=createPorter();
  // Doors start closed. Reception door is permanently open for the start area.
  doors.doorReception.opened=true;doors.doorReception.progress=1;doors.doorReception.openTarget=1;
  colliderList.splice(colliderList.indexOf(doors.doorReception.collider),1);
@@ -301,8 +301,10 @@ function updateObjective(){
  else if(state.chapter===2)t=state.record?'Ve a pediatría y busca la habitación 317.':'Restablece la corriente y lee el registro.';
  else if(state.chapter===3)t=state.drawing&&state.photo?'Investiga los archivos médicos.':'Encuentra el dibujo y la fotografía en pediatría.';
  else if(state.chapter===4)t=state.incident?'Investiga la morgue y el sótano técnico.':'Abre el archivo y lee el expediente de 2006.';
- else if(state.chapter===5)t=state.generator&&state.clockCode?'Ve al despacho del director.':'Recupera la cinta, descubre el código y activa el generador.';
- else t=state.directorEvidence?'Decide qué hacer con la verdad.':'Entra en dirección y examina el expediente original.';
+ else if(state.chapter===5)t=state.securityTape&&state.clockCode?'Accede al sótano técnico.':'Busca en la morgue la cinta de vigilancia y la nota del reloj.';
+ else if(state.chapter===6)t=state.generator?'Dirígete al despacho del director.':'Entra en el sótano técnico y activa el generador.';
+ else if(state.chapter===7)t=state.directorEvidence?'Lee el expediente y decide.':'Introduce el código 0317 en la puerta de dirección.';
+ else t='Decide qué hacer con la verdad de Alma.';
  $('objective').textContent=t;
 }
 function addEvidence(name,desc){
@@ -332,6 +334,10 @@ function loadGame(){
  }catch(e){toast('La partida guardada no se puede leer.');return false;}
 }
 function syncWorldState(){
+ for(const d of Object.values(doors)){
+  d.opened=false;d.openTarget=0;d.progress=0;d.group.position.z=d.z;
+  if(!colliderList.includes(d.collider))colliderList.push(d.collider);
+ }
  openDoorInstant('doorReception');
  if(state.power)openDoorInstant('doorWard');
  if(state.ward)doors.doorWard.opened=true;
@@ -341,7 +347,7 @@ function syncWorldState(){
  if(state.basement)openDoorInstant('doorBasement');
  if(state.directorCode)openDoorInstant('doorDirector');
  if(alma)alma.visible=state.drawing;
- if(enemy)enemy.visible=state.incident;
+ if(enemy)enemy.visible=state.record||state.incident||state.generator;
  updateObjective();updateHUD();
 }
 function openDoorInstant(id){
@@ -354,15 +360,16 @@ function animateDoor(d,open){
 function handleDoor(id){
  const d=doors[id];if(!d)return;
  if(id==='doorDirector'){
-  if(!state.generator||!state.clockCode){toast('Necesitas activar el generador y descubrir el código 0317.');return;}
+  if(!state.generator||!state.clockCode||!state.securityTape){toast('Necesitas la cinta, la nota del reloj y el generador.');return;}
   $('codeInput').value='';$('codeFeedback').textContent='Introduce el código de cuatro cifras.';openPanel('codePanel');return;
  }
  let ok=false;
  if(id==='doorWard')ok=state.power;
  if(id==='door317')ok=state.key&&state.record;
  if(id==='doorArchive')ok=state.photo&&state.drawing;
- if(id==='doorMorgue'||id==='doorBasement')ok=state.incident;
- if(!ok){const msg={doorWard:'La cerradura magnética no tiene corriente.',door317:'Necesitas el llavero y el registro de enfermería.',doorArchive:'La fotografía y el dibujo revelan el acceso al archivo.',doorMorgue:'Primero debes encontrar el expediente de 2006.',doorBasement:'La puerta está sellada hasta encontrar el expediente.'};toast(msg[id]||'La puerta está cerrada.');return;}
+ if(id==='doorMorgue')ok=state.incident;
+ if(id==='doorBasement')ok=state.securityTape&&state.clockCode;
+ if(!ok){const msg={doorWard:'La cerradura magnética no tiene corriente.',door317:'Necesitas el llavero y el registro de enfermería.',doorArchive:'La fotografía y el dibujo revelan el acceso al archivo.',doorMorgue:'Primero debes encontrar el expediente de 2006.',doorBasement:'Debes revisar la cinta de vigilancia y la nota del reloj antes de bajar al sótano.'};toast(msg[id]||'La puerta está cerrada.');return;}
  animateDoor(d,true);soundDoor();
  if(id==='doorWard'){state.ward=true;chapter(2,'LA PLANTA CERRADA','EL REGISTRO DE ENFERMERÍA');subtitle('ALTAVOZ: Personal autorizado, planta norte.');}
  if(id==='door317'){state.room317=true;toast('La habitación 317 se abre.');}
@@ -394,13 +401,13 @@ function interact(o){
  case'alma':
   if(!state.drawing){toast('La figura se desvanece.');break;}state.almaMet=true;state.secretClues++;addEvidence('Recuerdo de Alma','«El celador no quiere que encuentres la cinta. Busca las luces rojas».');subtitle('ALMA: Él cerró la puerta. La llave no estaba con él…');toast('Alma te ha dejado una pista.');break;
  case'archiveDoc':
-  if(!state.archive){toast('El archivo médico está cerrado.');break;}state.incident=true;addEvidence('Expediente 14/09/2006','Daniel entró en la habitación 317 a las 03:12. La muerte se registró a las 03:17.');openDocument('EXPEDIENTE 14/09/2006','El doctor Daniel Salvatierra accedió a la habitación 317 a las 03:12. La paciente falleció a las 03:17.\\n\\nLa investigación interna fue cerrada por orden de dirección.\\n\\nNota: «No registrar la discusión sobre el resultado de ADN».');chapter(5,'LOS SÓTANOS','LA CINTA QUE FALTA');enemy.visible=true;subtitle('CELADOR: No deberías haber abierto ese archivo.');break;
+  if(!state.archive){toast('El archivo médico está cerrado.');break;}state.incident=true;addEvidence('Expediente 14/09/2006','Daniel entró en la habitación 317 a las 03:12. La muerte se registró a las 03:17.');openDocument('EXPEDIENTE 14/09/2006','El doctor Daniel Salvatierra accedió a la habitación 317 a las 03:12. La paciente falleció a las 03:17.\\n\\nLa investigación interna fue cerrada por orden de dirección.\\n\\nNota: «No registrar la discusión sobre el resultado de ADN».');chapter(4,'LOS ARCHIVOS','EL INFORME ORIGINAL');enemy.visible=true;subtitle('CELADOR: No deberías haber abierto ese archivo.');break;
  case'securityTape':
   if(!state.morgue){toast('La morgue todavía no está abierta.');break;}state.securityTape=true;addEvidence('Cinta de vigilancia','Una cámara muestra a Daniel entrando en la habitación 317.');openDocument('REGISTRO DE SEGURIDAD · 03:17','03:12 — Daniel entra en la habitación 317.\\n03:16 — La señal pierde imagen.\\n03:17 — Tres pitidos. La cámara se apaga.\\n03:19 — Un celador recoge una llave que no figura en el inventario.');break;
  case'clockNote':
   if(!state.morgue){toast('La morgue todavía no está abierta.');break;}state.clockCode=true;addEvidence('Nota del reloj','La hora detenida en el reloj: 03:17.');openDocument('RELOJ DE LA MORGUE','El reloj está detenido a las 03:17.\\n\\nEn la parte posterior alguien escribió: «La última puerta abre con la hora».\\n\\nCódigo: 0317.');toast('Has descubierto el código 0317.');break;
  case'generator':
-  if(!state.basement){toast('La sala técnica está cerrada.');break;}if(state.generator){toast('El generador ya está funcionando.');break;}state.generator=true;addEvidence('Registro del generador','La energía del ala norte se restauró a las 03:17.');openDocument('GENERADOR DE EMERGENCIA','El interruptor se resiste. Al activarlo, el edificio entero vibra.\\n\\nEn el panel: 03:17.\\n\\nUna grabación automática reproduce una voz infantil: «Papá, tengo miedo».');chapter(6,'LA ÚLTIMA NOCHE','EL DESPACHO DEL DIRECTOR');subtitle('CELADOR: Ahora ya sabes lo que pasó.');enemy.visible=true;break;
+  if(!state.basement){toast('La sala técnica está cerrada.');break;}if(state.generator){toast('El generador ya está funcionando.');break;}state.generator=true;addEvidence('Registro del generador','La energía del ala norte se restauró a las 03:17.');openDocument('GENERADOR DE EMERGENCIA','El interruptor se resiste. Al activarlo, el edificio entero vibra.\\n\\nEn el panel: 03:17.\\n\\nUna grabación automática reproduce una voz infantil: «Papá, tengo miedo».');subtitle('CELADOR: Ahora ya sabes lo que pasó.');enemy.visible=true;break;
  case'directorFile':
   if(!state.directorCode){toast('La puerta de dirección está cerrada.');break;}state.directorEvidence=true;addEvidence('Expediente original','La dirección ordenó cerrar la investigación y alterar el registro.');openDocument('EXPEDIENTE ORIGINAL · DANIEL SALVATIERRA','La prueba genética fue recibida el 14/09/2006.\\n\\nDaniel descubrió que no era el padre biológico de Alma.\\n\\nLa discusión en la habitación 317 fue ocultada por la dirección. El celador recibió instrucciones para retirar la cinta.\\n\\nA las 03:17, Alma dejó de responder.');break;
  case'batteries':
@@ -458,12 +465,12 @@ function startGame(fresh){
   for(const d of Object.values(doors)){d.opened=false;d.openTarget=0;d.progress=0;d.group.position.z=d.z;const panel=d.group.children[0];panel.material=d.id==='doorBasement'?M.red:M.wood;if(!colliderList.includes(d.collider))colliderList.push(d.collider);}
   openDoorInstant('doorReception');
  }else{if(!loadGame()){toast('No existe una partida válida.');return;}}
- started=true;paused=false;modal='';$('startScreen').classList.add('hidden');$('hud').classList.remove('hidden');$('crosshair').classList.remove('hidden');$('controlHint').classList.remove('hidden');chapter(state.chapter,({1:'EL CONTRATO',2:'LA PLANTA CERRADA',3:'HABITACIÓN 317',4:'LOS ARCHIVOS',5:'EL SÓTANO',6:'LA ÚLTIMA NOCHE'})[state.chapter]||'EL TURNO','HOSPITAL SANTA AURELIA · 2026');subtitle('ÁLEX: Cincuenta euros la hora. ¿Qué podría salir mal?');updateObjective();updateHUD();lockPointer();
+ started=true;paused=false;modal='';$('startScreen').classList.add('hidden');$('hud').classList.remove('hidden');$('crosshair').classList.remove('hidden');$('controlHint').classList.remove('hidden');chapter(state.chapter,({1:'EL CONTRATO',2:'LA PLANTA CERRADA',3:'HABITACIÓN 317',4:'LOS ARCHIVOS',5:'LA MORGUE',6:'EL SÓTANO',7:'EL DESPACHO',8:'LA ÚLTIMA NOCHE'})[state.chapter]||'EL TURNO','HOSPITAL SANTA AURELIA · 2026');subtitle('ÁLEX: Cincuenta euros la hora. ¿Qué podría salir mal?');updateObjective();updateHUD();lockPointer();
 }
 function updateHUD(){
  const mins=Math.floor((23*60+gameMinutes)%1440),hh=String(Math.floor(mins/60)).padStart(2,'0'),mm=String(mins%60).padStart(2,'0');$('clock').textContent=hh+':'+mm;
  $('batteryValue').textContent=Math.round(flashBattery)+'%';$('batteryBar').style.width=flashBattery+'%';$('staminaBar').style.width=stamina+'%';$('torchState').textContent=flashOn?'ENCENDIDA':'APAGADA';
- $('enemyState').textContent=state.chapter>=5?'PELIGRO ACTIVO':'SEÑAL DESCONOCIDA';
+ $('enemyState').textContent=state.chapter>=3?'PELIGRO ACTIVO':'SEÑAL DESCONOCIDA';
 }
 function showDeath(){
  paused=true;modal='deathPanel';$('deathPanel').classList.remove('hidden');document.exitPointerLock?.();
@@ -474,8 +481,10 @@ function retryCheckpoint(){
 function updateProgress(){
  if(state.chapter===2&&state.record){chapter(3,'HABITACIÓN 317','LA NIÑA DEL DIBUJO');}
  if(state.chapter===3&&state.drawing&&state.photo){chapter(4,'LOS ARCHIVOS','EL INFORME ORIGINAL');}
- if(state.chapter===4&&state.incident){chapter(5,'EL SÓTANO','LA CINTA DE VIGILANCIA');enemy.visible=true;}
- if(state.chapter===5&&state.generator&&state.clockCode){chapter(6,'LA ÚLTIMA NOCHE','EL CÓDIGO 0317');}
+ if(state.chapter===4&&state.incident){chapter(5,'LA MORGUE','LA CINTA Y LA HORA');enemy.visible=true;}
+ if(state.chapter===5&&state.securityTape&&state.clockCode){chapter(6,'EL SÓTANO','RESTABLECE LA ENERGÍA');}
+ if(state.chapter===6&&state.generator){chapter(7,'EL DESPACHO','EL CÓDIGO 0317');}
+ if(state.chapter===7&&state.directorEvidence){chapter(8,'LA ÚLTIMA NOCHE','EL DESTINO DE ALMA');}
 }
 function updateDoors(dt){
  for(const d of Object.values(doors)){
@@ -548,7 +557,7 @@ function updateFrame(){
  if(chapterTimer>0&&(chapterTimer-=dt)<=0)$('chapterCard').classList.add('hidden');
 }
 function onKeyDown(e){
- if(['Tab','Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();
+ if(['Tab','Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','F5','F9'].includes(e.code))e.preventDefault();
  keys.add(e.code);if(e.repeat)return;
  if(e.code==='KeyE'&&started&&!modal)interact(nearestInteractable());
  if(e.code==='KeyF'&&started&&!modal){flashOn=!flashOn&&flashBattery>0;if(flashBattery<=0)toast('No queda batería.');else toast(flashOn?'Linterna encendida.':'Linterna apagada.');}
