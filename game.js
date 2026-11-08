@@ -231,7 +231,7 @@ function createPorter(){
 function loadCharacterMeshes(){
  if(!THREE.GLTFLoader)return;
  const loader=new THREE.GLTFLoader();
- loader.load('./assets/0317-characters.glb',gltf=>{
+ loader.load('./assets/0317-characters.glb?v=20261108-2',gltf=>{
   const pairs=[['CHARACTER_ALMA',alma],['CHARACTER_NIGHT_PORTER',enemy]];
   for(const [name,target] of pairs){
    const source=gltf.scene.getObjectByName(name);
@@ -314,14 +314,31 @@ function chapter(n,title,sub){
 }
 function updateObjective(){
  let t='';
- if(state.chapter===1)t=state.key?'Encuentra el fusible y el protocolo.':'Lee el contrato y recoge el llavero.';
- else if(state.chapter===2)t=state.record?'Ve a pediatría y busca la habitación 317.':'Restablece la corriente y lee el registro.';
- else if(state.chapter===3)t=state.drawing&&state.photo?'Investiga los archivos médicos.':'Encuentra el dibujo y la fotografía en pediatría.';
- else if(state.chapter===4)t=state.incident?'Investiga la morgue y el sótano técnico.':'Abre el archivo y lee el expediente de 2006.';
- else if(state.chapter===5)t=state.securityTape&&state.clockCode?'Accede al sótano técnico.':'Busca en la morgue la cinta de vigilancia y la nota del reloj.';
- else if(state.chapter===6)t=state.generator?'Dirígete al despacho del director.':'Entra en el sótano técnico y activa el generador.';
- else if(state.chapter===7)t=state.directorEvidence?'Lee el expediente y decide.':'Introduce el código 0317 en la puerta de dirección.';
- else t='Decide qué hacer con la verdad de Alma.';
+ if(state.chapter===1){
+  if(!state.flags.includes('contract'))t='Lee el contrato nocturno.';
+  else if(!state.key)t='Recoge el llavero de mantenimiento.';
+  else if(!state.fuse)t='Busca el fusible cerámico.';
+  else if(!state.protocol)t='Lee el protocolo de rearme.';
+  else t='Examina el cuadro eléctrico y activa las fases 1 → 3 → 2.';
+ }else if(state.chapter===2){
+  if(!state.power)t='Restablece la corriente en el cuadro B.';
+  else if(!state.record)t='Entra en enfermería y lee el registro de Alma.';
+  else t='Ve a pediatría y busca la habitación 317.';
+ }else if(state.chapter===3){
+  if(!state.drawing)t='En la habitación 317, examina el dibujo infantil.';
+  else if(!state.photo)t='Busca y examina la fotografía familiar.';
+  else t='Accede al archivo médico. Hablar con Alma es una pista opcional.';
+ }else if(state.chapter===4){
+  t=state.incident?'Investiga la morgue: busca la cinta y la nota del reloj.':'Abre el archivo y lee el expediente de 2006.';
+ }else if(state.chapter===5){
+  if(!state.securityTape)t='En la morgue, recupera la cinta de vigilancia.';
+  else if(!state.clockCode)t='Lee la nota del reloj detenido a las 03:17.';
+  else t='Baja al sótano técnico.';
+ }else if(state.chapter===6){
+  t=state.generator?'Dirígete al despacho del director.':'Entra en el sótano técnico y activa el generador.';
+ }else if(state.chapter===7){
+  t=state.directorEvidence?'Lee el expediente y decide.':'Introduce el código 0317 en la puerta de dirección.';
+ }else t='Decide qué hacer con la verdad de Alma.';
  $('objective').textContent=t;
 }
 function addEvidence(name,desc){
